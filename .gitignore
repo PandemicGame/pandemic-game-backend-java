@@ -3,6 +3,9 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+.env
+!.env.example
+
 ### Maven ###
 .mvn
 mvnw
