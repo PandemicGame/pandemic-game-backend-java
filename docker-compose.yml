@@ -16,7 +16,7 @@ services:
       - database
 
   database:
-    image: postgres:latest
+    image: postgres:17.4
     container_name: pandemic-database
     environment:
       POSTGRES_USER: ${DATABASE_USERNAME}
