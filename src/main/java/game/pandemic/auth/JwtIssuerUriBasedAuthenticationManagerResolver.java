@@ -3,6 +3,7 @@ package game.pandemic.auth;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationManagerResolver;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.security.oauth2.server.resource.authentication.JwtIssuerAuthenticationManagerResolver;
@@ -16,9 +17,11 @@ import java.util.stream.Collectors;
 public class JwtIssuerUriBasedAuthenticationManagerResolver implements AuthenticationManagerResolver<HttpServletRequest> {
     private final AuthenticationManagerResolver<HttpServletRequest> authenticationManagerResolver;
     private final JwtIssuerConfig jwtIssuerConfig;
+    private final JwtToAccountConverter jwtToAccountConverter;
 
-    public JwtIssuerUriBasedAuthenticationManagerResolver(final JwtIssuerConfig jwtIssuerConfig) {
+    public JwtIssuerUriBasedAuthenticationManagerResolver(final JwtIssuerConfig jwtIssuerConfig, final JwtToAccountConverter jwtToAccountConverter) {
         this.jwtIssuerConfig = jwtIssuerConfig;
+        this.jwtToAccountConverter = jwtToAccountConverter;
         final Map<String, AuthenticationManager> authenticationManagerMap = getAuthenticationManagerMap();
         this.authenticationManagerResolver = new JwtIssuerAuthenticationManagerResolver(authenticationManagerMap::get);
     }
@@ -30,7 +33,9 @@ public class JwtIssuerUriBasedAuthenticationManagerResolver implements Authentic
     }
 
     private Map.Entry<String, AuthenticationManager> getJwtIssuerUriToAuthenticationManagerAssociation(final String issuerUri) {
-        final JwtAuthenticationProvider authenticationProvider = new JwtAuthenticationProvider(JwtDecoders.fromIssuerLocation(issuerUri));
+        final JwtDecoder jwtDecoder = JwtDecoders.fromIssuerLocation(issuerUri);
+        final JwtAuthenticationProvider authenticationProvider = new JwtAuthenticationProvider(jwtDecoder);
+        authenticationProvider.setJwtAuthenticationConverter(this.jwtToAccountConverter);
         return new AbstractMap.SimpleEntry<>(issuerUri, authenticationProvider::authenticate);
     }
 
