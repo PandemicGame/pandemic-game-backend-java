@@ -10,6 +10,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
+import static game.pandemic.user.UserController.GET_ACCESS_TOKEN_OAUTH2_URL;
+import static game.pandemic.user.UserController.REQUEST_MAPPING;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -21,7 +24,8 @@ public class WebSecurityConfig {
         return http
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().authenticated()
+                        .requestMatchers(REQUEST_MAPPING + GET_ACCESS_TOKEN_OAUTH2_URL).authenticated()
+                        .anyRequest().permitAll()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .authenticationManagerResolver(this.authenticationManagerResolver)
