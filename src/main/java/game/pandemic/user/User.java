@@ -20,6 +20,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Setter
+    @Column(unique = true)
     private UUID accessToken;
     private String name;
     @OneToOne
