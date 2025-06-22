@@ -2,6 +2,7 @@ package game.pandemic.user;
 
 import game.pandemic.auth.Account;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,11 +22,15 @@ public class UserController {
 
     @GetMapping(GET_ACCESS_TOKEN_OAUTH2_URL)
     public ResponseEntity<String> getAccessTokenForRegisteredUser(@AuthenticationPrincipal final Account account) {
-        return ResponseEntity.ok(this.userService.getAccessTokenForRegisteredUser(account));
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(this.userService.getAccessTokenForRegisteredUser(account));
     }
 
     @GetMapping(GET_ACCESS_TOKEN_URL)
     public ResponseEntity<String> getAccessTokenForGuestUser(@RequestParam final String username) {
-        return ResponseEntity.ok(this.userService.getAccessTokenForGuestUser(username));
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(this.userService.getAccessTokenForGuestUser(username));
     }
 }
