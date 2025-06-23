@@ -41,4 +41,8 @@ public class UserService {
         final User user = new User(username);
         return generateAccessTokenAndSaveUser(user);
     }
+
+    public Optional<User> findUserByAccessToken(final UUID accessToken) {
+        return this.userRepository.findUserByAccessToken(accessToken);
+    }
 }

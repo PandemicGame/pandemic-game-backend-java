@@ -1,6 +1,8 @@
 package game.pandemic.user;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import game.pandemic.auth.Account;
+import game.pandemic.jackson.JacksonView;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -11,6 +13,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(UserController.REQUEST_MAPPING)
@@ -37,5 +42,20 @@ public class UserController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(this.userService.getAccessTokenForGuestUser(username));
+    }
+
+    @GetMapping
+    @JsonView(JacksonView.Read.class)
+    public ResponseEntity<User> getUserByAccessToken(@RequestParam final UUID accessToken) {
+        final Optional<User> userOptional = this.userService.findUserByAccessToken(accessToken);
+        if (userOptional.isPresent()) {
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(userOptional.get());
+        } else {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .build();
+        }
     }
 }
