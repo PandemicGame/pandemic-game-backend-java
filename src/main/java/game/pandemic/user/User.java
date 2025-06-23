@@ -1,6 +1,8 @@
 package game.pandemic.user;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import game.pandemic.auth.Account;
+import game.pandemic.jackson.JacksonView;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -18,10 +20,12 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(JacksonView.Any.class)
     private Long id;
     @Setter
     @Column(unique = true)
     private UUID accessToken;
+    @JsonView(JacksonView.Any.class)
     private String name;
     @OneToOne
     private Account account;
