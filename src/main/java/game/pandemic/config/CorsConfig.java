@@ -48,7 +48,8 @@ public class CorsConfig {
 
     private List<String> getAllowedHeaders() {
         return List.of(
-                HttpHeaders.AUTHORIZATION
+                HttpHeaders.AUTHORIZATION,
+                HttpHeaders.CONTENT_TYPE
         );
     }
 }

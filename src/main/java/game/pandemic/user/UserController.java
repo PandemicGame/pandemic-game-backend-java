@@ -9,10 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -44,9 +41,9 @@ public class UserController {
                 .body(this.userService.getAccessTokenForGuestUser(username));
     }
 
-    @GetMapping
+    @PostMapping
     @JsonView(JacksonView.Read.class)
-    public ResponseEntity<User> getUserByAccessToken(@RequestParam final UUID accessToken) {
+    public ResponseEntity<User> getUserByAccessToken(@RequestBody final UUID accessToken) {
         final Optional<User> userOptional = this.userService.findUserByAccessToken(accessToken);
         if (userOptional.isPresent()) {
             return ResponseEntity
