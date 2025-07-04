@@ -1,5 +1,6 @@
 package game.pandemic.config;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Configuration
+@Getter
 public class CorsConfig {
     @Value("${cors.allowed-origins}")
     private String[] allowedOrigins;
@@ -27,13 +29,13 @@ public class CorsConfig {
 
     private CorsConfiguration getCorsConfiguration() {
         final CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedOrigins(getAllowedOrigins());
+        corsConfiguration.setAllowedOrigins(getAllowedOriginsAsList());
         corsConfiguration.setAllowedMethods(getAllowedMethods());
         corsConfiguration.setAllowedHeaders(getAllowedHeaders());
         return corsConfiguration;
     }
 
-    private List<String> getAllowedOrigins() {
+    private List<String> getAllowedOriginsAsList() {
         return Arrays.asList(this.allowedOrigins);
     }
 
