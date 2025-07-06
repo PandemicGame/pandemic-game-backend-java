@@ -3,7 +3,7 @@ package game.pandemic.jackson;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @JsonTypeInfo(
-        use = JsonTypeInfo.Id.CLASS,
+        use = JsonTypeInfo.Id.SIMPLE_NAME,
         property = "@class"
 )
 public interface IJacksonPolymorphicMappable {
