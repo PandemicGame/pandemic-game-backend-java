@@ -3,6 +3,7 @@ package game.pandemic.user;
 import com.fasterxml.jackson.annotation.JsonView;
 import game.pandemic.auth.Account;
 import game.pandemic.jackson.JacksonView;
+import game.pandemic.websocket.auth.IWebSocketAuthenticationObject;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -15,7 +16,7 @@ import java.util.UUID;
 @Table(name = User.TABLE_NAME)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class User {
+public class User implements IWebSocketAuthenticationObject {
     public static final String TABLE_NAME = "application_user";
 
     @Id
