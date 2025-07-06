@@ -87,6 +87,7 @@ public abstract class WebSocketHandler<A extends IWebSocketAuthenticationObject>
     }
 
     protected void handleAuthenticationSuccess(final WebSocketSession session, final A authenticationObject) {
+        this.webSocketSessionRegistry.removeSession(session);
         this.webSocketSessionRegistry.addSession(session, authenticationObject);
     }
 
