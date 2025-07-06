@@ -1,6 +1,6 @@
 package game.pandemic.websocket;
 
-import game.pandemic.jackson.IJacksonPolymorphicMappable;
+import game.pandemic.jackson.IJsonTypeInfo;
 
-public interface IWebSocketData extends IJacksonPolymorphicMappable {
+public interface IWebSocketData extends IJsonTypeInfo {
 }
