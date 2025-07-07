@@ -1,42 +1,34 @@
 package game.pandemic.user;
 
-import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import game.pandemic.auth.Account;
-import game.pandemic.jackson.JacksonView;
+import game.pandemic.chat.ChatMessageSender;
 import game.pandemic.websocket.auth.IWebSocketAuthenticationObject;
-import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToOne;
+import lombok.*;
 
 import java.util.UUID;
 
 @Entity
-@Table(name = User.TABLE_NAME)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 @Getter
-public class User implements IWebSocketAuthenticationObject {
-    public static final String TABLE_NAME = "application_user";
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonView(JacksonView.Any.class)
-    private Long id;
+public class User extends ChatMessageSender implements IWebSocketAuthenticationObject {
     @Setter
     @Column(unique = true)
+    @JsonIgnore
     private UUID accessToken;
-    @JsonView(JacksonView.Any.class)
-    private String name;
     @OneToOne
     private Account account;
 
     public User(final String name) {
-        this.name = name;
+        super(name);
     }
 
     public User(final Account account) {
-        this.name = account.getUsername();
+        this(account.getUsername());
         this.account = account;
     }
 
