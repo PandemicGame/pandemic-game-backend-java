@@ -1,6 +1,6 @@
 package game.pandemic.user.websocket;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import game.pandemic.jackson.ObjectMapper;
 import game.pandemic.user.User;
 import game.pandemic.websocket.WebSocketSessionRegistry;
 import game.pandemic.websocket.auth.IWebSocketAuthenticationObjectRepository;
