@@ -1,6 +1,7 @@
 package game.pandemic.user;
 
 import game.pandemic.auth.Account;
+import game.pandemic.chat.chats.global.GlobalChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +11,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    private final GlobalChatService globalChatService;
     private final UserRepository userRepository;
 
     public String getAccessTokenForRegisteredUser(final Account account) {
@@ -29,7 +31,9 @@ public class UserService {
 
     private User generateAccessTokenAndSaveUser(final User user) {
         user.setAccessToken(UUID.randomUUID());
-        return this.userRepository.save(user);
+        final User saved = this.userRepository.save(user);
+        this.globalChatService.addMember(saved);
+        return saved;
     }
 
     public String getAccessTokenForGuestUser(final String username) {
