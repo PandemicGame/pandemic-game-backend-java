@@ -1,7 +1,6 @@
 package game.pandemic.websocket.endpoint;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import game.pandemic.jackson.ObjectMapper;
 import game.pandemic.websocket.WebSocketSessionRegistry;
 import game.pandemic.websocket.auth.IWebSocketAuthenticationObject;
 import game.pandemic.websocket.auth.IWebSocketAuthenticationObjectRepository;
@@ -52,13 +51,7 @@ public abstract class WebSocketHandler<A extends IWebSocketAuthenticationObject>
 
     protected void deserializeTextMessageAndProcess(final WebSocketSession session, final TextMessage message) {
         final String payload = message.getPayload();
-
-        try {
-            final WebSocketMessage webSocketMessage = this.objectMapper.readValue(payload, WebSocketMessage.class);
-            validateWebSocketMessageAndProcess(session, webSocketMessage);
-        } catch (final JsonProcessingException e) {
-            log.warn("An error occurred during deserialization of: " + payload);
-        }
+        this.objectMapper.deserialize(payload, WebSocketMessage.class, w -> validateWebSocketMessageAndProcess(session, w));
     }
 
     protected void validateWebSocketMessageAndProcess(final WebSocketSession session, final WebSocketMessage webSocketMessage) {
