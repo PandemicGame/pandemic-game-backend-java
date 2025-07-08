@@ -21,9 +21,11 @@ public abstract class Chat implements IWebSocketData {
     @JsonView(JacksonView.Read.class)
     protected Long id;
     @ManyToMany
+    @JsonView(JacksonView.Read.class)
     private Set<ChatMessageSender> members;
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderColumn(name = "createdAt")
+    @JsonView(JacksonView.Read.class)
     protected Set<ChatMessage> messages;
 
     protected Chat(final Set<ChatMessageSender> members) {

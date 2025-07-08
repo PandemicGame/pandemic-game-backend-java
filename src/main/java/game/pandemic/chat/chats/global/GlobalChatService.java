@@ -33,10 +33,18 @@ public class GlobalChatService {
 
     @Transactional
     public void addMember(final ChatMessageSender member) {
-        final Optional<GlobalChat> globalChatOptional = this.globalChatRepository.findTopBy();
+        final Optional<GlobalChat> globalChatOptional = findGlobalChat();
         globalChatOptional.ifPresent(globalChat -> {
             globalChat.addMember(member);
             this.globalChatRepository.save(globalChat);
         });
+    }
+
+    public boolean isGlobalChatIdentifier(final String id) {
+        return GlobalChat.GLOBAL_CHAT_IDENTIFIER.equals(id);
+    }
+
+    public Optional<GlobalChat> findGlobalChat() {
+        return this.globalChatRepository.findTopBy();
     }
 }
