@@ -22,6 +22,11 @@ public class LobbyService {
     private final IUnicastMessenger<User> userMessenger;
 
     @Transactional
+    public void sendLobbiesToUser(final User user) {
+        this.userMessenger.unicast(user, this.lobbyRepository.findAll(), JacksonView.Read.class);
+    }
+
+    @Transactional
     public void createLobby(final User user, final String name) {
         final UserLobbyMember userLobbyMember = createUserLobbyMember(user);
         final Lobby lobby = new Lobby(name, userLobbyMember);
