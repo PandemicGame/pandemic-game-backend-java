@@ -8,8 +8,8 @@ import game.pandemic.websocket.auth.IWebSocketAuthenticationObject;
 import org.springframework.stereotype.Component;
 
 @Component
-public class Fetch<A extends ChatMessageSender & IWebSocketAuthenticationObject> extends ChatWebSocketControllerEndpoint<A> {
-    public Fetch(final ObjectMapper objectMapper, final ChatService chatService) {
+public class FetchChat<A extends ChatMessageSender & IWebSocketAuthenticationObject> extends ChatWebSocketControllerEndpoint<A> {
+    public FetchChat(final ObjectMapper objectMapper, final ChatService chatService) {
         super(objectMapper, chatService);
     }
 
