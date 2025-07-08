@@ -7,6 +7,7 @@ import game.pandemic.chat.chats.Chat;
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.websocket.IWebSocketData;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +26,7 @@ public class ChatMessage implements IWebSocketData {
     @ManyToOne
     @JsonView(JacksonView.Read.class)
     private ChatMessageSender sender;
+    @Getter
     @Setter
     @ManyToOne
     @JsonView(JacksonView.Read.class)
@@ -35,6 +37,7 @@ public class ChatMessage implements IWebSocketData {
     @JsonView(JacksonView.Create.class)
     private Long chatId;
     @JsonView(JacksonView.Any.class)
+    @NotBlank
     private String message;
     @JsonView(JacksonView.Read.class)
     private ZonedDateTime createdAt;
