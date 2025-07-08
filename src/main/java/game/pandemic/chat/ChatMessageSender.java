@@ -21,9 +21,9 @@ public abstract class ChatMessageSender implements IWebSocketData {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     @JsonView(JacksonView.Read.class)
-    protected Long id;
+    private Long id;
     @JsonView(JacksonView.Read.class)
-    protected String name;
+    private String name;
 
     protected ChatMessageSender(final String name) {
         this.name = name;
