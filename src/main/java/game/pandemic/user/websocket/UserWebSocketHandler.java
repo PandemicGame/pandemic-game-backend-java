@@ -1,7 +1,7 @@
 package game.pandemic.user.websocket;
 
 import game.pandemic.jackson.ObjectMapper;
-import game.pandemic.messaging.messengers.IUnicastMessenger;
+import game.pandemic.messaging.messengers.IUnicastAndMulticastMessenger;
 import game.pandemic.user.User;
 import game.pandemic.validation.ValidationService;
 import game.pandemic.websocket.WebSocketSessionRegistry;
@@ -16,14 +16,14 @@ import java.util.List;
 @Component
 public class UserWebSocketHandler extends WebSocketHandler<User> {
     public UserWebSocketHandler(final WebSocketSessionRegistry<User> webSocketSessionRegistry,
-                                final IUnicastMessenger<WebSocketSession> webSocketSessionUnicastMessenger,
+                                final IUnicastAndMulticastMessenger<WebSocketSession> webSocketSessionMessenger,
                                 final IWebSocketAuthenticationObjectRepository<User> webSocketAuthenticationObjectRepository,
                                 final List<IWebSocketController<User>> webSocketControllers,
                                 final ObjectMapper objectMapper,
                                 final ValidationService validationService) {
         super(
                 webSocketSessionRegistry,
-                webSocketSessionUnicastMessenger,
+                webSocketSessionMessenger,
                 webSocketAuthenticationObjectRepository,
                 webSocketControllers,
                 objectMapper,
