@@ -6,6 +6,7 @@ import game.pandemic.chat.chats.global.GlobalChatService;
 import game.pandemic.chat.message.ChatMessage;
 import game.pandemic.chat.message.ChatMessageRepository;
 import game.pandemic.jackson.JacksonView;
+import game.pandemic.validation.ValidationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -24,6 +25,7 @@ public class ChatService {
     private final ChatMessageSenderMessenger chatMessageSenderMessenger;
     private final ChatRepository chatRepository;
     private final GlobalChatService globalChatService;
+    private final ValidationService validationService;
 
     @Transactional
     public void createChatMessage(final ChatMessageSender sender, final ChatMessage chatMessage) {
@@ -31,15 +33,17 @@ public class ChatService {
 
         executeIfChatExistsAndEntityIsMember(sender, chatMessage.getChatId(), this.chatRepository::findById, (m, c) -> {
             chatMessage.setChat(c);
-
-            final ChatMessage saved = this.chatMessageRepository.save(chatMessage);
-
-            sendChatMessageToChatMembers(c, saved);
+            this.validationService.validate(chatMessage, this::saveAndSendChatMessageToChatMembers);
         });
     }
 
-    private void sendChatMessageToChatMembers(final Chat chat, final ChatMessage chatMessage) {
-        this.chatMessageSenderMessenger.multicast(chat.getMembers(), chatMessage, JacksonView.Read.class);
+    private void saveAndSendChatMessageToChatMembers(final ChatMessage chatMessage) {
+        final ChatMessage saved = this.chatMessageRepository.save(chatMessage);
+        sendChatMessageToChatMembers(saved);
+    }
+
+    private void sendChatMessageToChatMembers(final ChatMessage chatMessage) {
+        this.chatMessageSenderMessenger.multicast(chatMessage.getChat().getMembers(), chatMessage, JacksonView.Read.class);
     }
 
     @Transactional
