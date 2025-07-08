@@ -1,5 +1,6 @@
 package game.pandemic.user.websocket;
 
+import game.pandemic.jackson.JacksonView;
 import game.pandemic.jackson.ObjectMapper;
 import game.pandemic.messaging.messengers.IUnicastAndMulticastMessenger;
 import game.pandemic.user.User;
@@ -53,7 +54,8 @@ public class UserWebSocketHandler extends WebSocketHandler<User> {
     protected void sendMessageWithAllUsersToAllUsers() {
         this.webSocketSessionMessenger.multicast(
                 this.webSocketSessionRegistry.findAllSessions(),
-                this.webSocketSessionRegistry.findAllAuthenticationObjects()
+                this.webSocketSessionRegistry.findAllAuthenticationObjects(),
+                JacksonView.Read.class
         );
     }
 }
