@@ -2,8 +2,7 @@ package game.pandemic.websocket;
 
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.jackson.ObjectMapper;
-import game.pandemic.messaging.messengers.IMulticastMessenger;
-import game.pandemic.messaging.messengers.IUnicastMessenger;
+import game.pandemic.messaging.messengers.IUnicastAndMulticastMessenger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -17,7 +16,7 @@ import java.util.Set;
 @Component
 @RequiredArgsConstructor
 @Log4j2
-public class WebSocketMessenger implements IUnicastMessenger<WebSocketSession>, IMulticastMessenger<WebSocketSession> {
+public class WebSocketMessenger implements IUnicastAndMulticastMessenger<WebSocketSession> {
     private final ObjectMapper objectMapper;
 
     @Override
