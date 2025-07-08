@@ -35,6 +35,7 @@ public class User extends ChatMessageSender implements IWebSocketAuthenticationO
         this.account = account;
     }
 
+    @JsonIgnore
     public String getAccessTokenString() {
         return this.accessToken.toString();
     }
