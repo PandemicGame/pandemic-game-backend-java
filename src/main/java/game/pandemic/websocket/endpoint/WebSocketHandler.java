@@ -2,12 +2,11 @@ package game.pandemic.websocket.endpoint;
 
 import game.pandemic.jackson.ObjectMapper;
 import game.pandemic.messaging.messengers.IUnicastMessenger;
+import game.pandemic.validation.ValidationService;
 import game.pandemic.websocket.WebSocketSessionRegistry;
 import game.pandemic.websocket.auth.IWebSocketAuthenticationObject;
 import game.pandemic.websocket.auth.IWebSocketAuthenticationObjectRepository;
 import game.pandemic.websocket.message.WebSocketMessage;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -18,7 +17,6 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
@@ -31,7 +29,7 @@ public abstract class WebSocketHandler<A extends IWebSocketAuthenticationObject>
     protected final IWebSocketAuthenticationObjectRepository<A> webSocketAuthenticationObjectRepository;
     protected final List<IWebSocketController<A>> webSocketControllers;
     protected final ObjectMapper objectMapper;
-    protected final Validator validator;
+    protected final ValidationService validationService;
 
     @Override
     public List<IWebSocketController<A>> getAllEndpoints() {
@@ -59,13 +57,7 @@ public abstract class WebSocketHandler<A extends IWebSocketAuthenticationObject>
     }
 
     protected void validateWebSocketMessageAndProcess(final WebSocketSession session, final WebSocketMessage webSocketMessage) {
-        final Set<ConstraintViolation<WebSocketMessage>> violations = this.validator.validate(webSocketMessage);
-
-        if (violations.isEmpty()) {
-            delegateWebSocketMessageToHandlers(session, webSocketMessage);
-        } else {
-            log.warn("Given WebSocketMessage is invalid. There are " + violations.size() + " constraint violations.");
-        }
+        this.validationService.validate(webSocketMessage, w -> delegateWebSocketMessageToHandlers(session, w));
     }
 
     protected void delegateWebSocketMessageToHandlers(final WebSocketSession session, final WebSocketMessage webSocketMessage) {
