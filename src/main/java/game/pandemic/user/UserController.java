@@ -42,7 +42,7 @@ public class UserController {
     }
 
     @PostMapping
-    @JsonView(JacksonView.Read.class)
+    @JsonView(JacksonView.AuthorizedRead.class)
     public ResponseEntity<User> getUserByAccessToken(@RequestBody final UUID accessToken) {
         final Optional<User> userOptional = this.userService.findUserByAccessToken(accessToken);
         if (userOptional.isPresent()) {

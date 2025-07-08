@@ -1,8 +1,10 @@
 package game.pandemic.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import game.pandemic.auth.Account;
 import game.pandemic.chat.ChatMessageSender;
+import game.pandemic.jackson.JacksonView;
 import game.pandemic.websocket.auth.IWebSocketAuthenticationObject;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,6 +23,7 @@ public class User extends ChatMessageSender implements IWebSocketAuthenticationO
     @JsonIgnore
     private UUID accessToken;
     @OneToOne
+    @JsonView(JacksonView.AuthorizedRead.class)
     private Account account;
 
     public User(final String name) {
