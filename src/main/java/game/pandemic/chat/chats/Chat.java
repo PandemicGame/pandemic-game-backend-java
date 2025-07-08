@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -24,9 +25,9 @@ public abstract class Chat implements IWebSocketData {
     @JsonView(JacksonView.Read.class)
     private Set<ChatMessageSender> members;
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderColumn(name = "createdAt")
+    @OrderBy("createdAt ASC")
     @JsonView(JacksonView.Read.class)
-    protected Set<ChatMessage> messages;
+    protected List<ChatMessage> messages;
 
     protected Chat(final Set<ChatMessageSender> members) {
         this.members = members;
