@@ -1,6 +1,7 @@
 package game.pandemic.websocket.endpoint;
 
 import game.pandemic.jackson.ObjectMapper;
+import game.pandemic.messaging.messengers.IUnicastMessenger;
 import game.pandemic.websocket.WebSocketSessionRegistry;
 import game.pandemic.websocket.auth.IWebSocketAuthenticationObject;
 import game.pandemic.websocket.auth.IWebSocketAuthenticationObjectRepository;
@@ -23,7 +24,10 @@ import java.util.UUID;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Log4j2
 public abstract class WebSocketHandler<A extends IWebSocketAuthenticationObject> extends TextWebSocketHandler implements IWebSocketEndpointDelegator<A, IWebSocketController<A>> {
+    public static final String AUTH_SUCCESS_RESPONSE = "AUTH_SUCCESS";
+
     protected final WebSocketSessionRegistry<A> webSocketSessionRegistry;
+    protected final IUnicastMessenger<WebSocketSession> webSocketSessionUnicastMessenger;
     protected final IWebSocketAuthenticationObjectRepository<A> webSocketAuthenticationObjectRepository;
     protected final List<IWebSocketController<A>> webSocketControllers;
     protected final ObjectMapper objectMapper;
@@ -82,6 +86,7 @@ public abstract class WebSocketHandler<A extends IWebSocketAuthenticationObject>
     protected void handleAuthenticationSuccess(final WebSocketSession session, final A authenticationObject) {
         this.webSocketSessionRegistry.removeSession(session);
         this.webSocketSessionRegistry.addSession(session, authenticationObject);
+        this.webSocketSessionUnicastMessenger.unicast(session, AUTH_SUCCESS_RESPONSE);
     }
 
     protected void handleAuthenticationError(final WebSocketSession session) {
