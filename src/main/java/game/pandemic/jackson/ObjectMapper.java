@@ -1,6 +1,5 @@
 package game.pandemic.jackson;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -62,12 +61,12 @@ public class ObjectMapper {
         );
     }
 
-    protected String serialize(final Object object, final Class<? extends JacksonView.Any> view) throws IOException {
+    protected String serialize(final Object object, final Class<?> view) throws IOException {
         return serialize(object, o -> this.mapper.writerWithView(view).writeValueAsString(o));
     }
 
     protected String serialize(final Object object) throws IOException {
-        return serialize(object, this.mapper::writeValueAsString);
+        return serialize(object, Object.class);
     }
 
     protected String serialize(final Object object,
@@ -123,12 +122,12 @@ public class ObjectMapper {
         );
     }
 
-    protected <T> T deserialize(final String string, final Class<T> targetClass, final Class<? extends JacksonView.Any> view) throws IOException {
+    protected <T> T deserialize(final String string, final Class<T> targetClass, final Class<?> view) throws IOException {
         return this.mapper.readerWithView(view).readValue(string, targetClass);
     }
 
-    protected <T> T deserialize(final String string, final Class<T> targetClass) throws JsonProcessingException {
-        return this.mapper.readValue(string, targetClass);
+    protected <T> T deserialize(final String string, final Class<T> targetClass) throws IOException {
+        return deserialize(string, targetClass, Object.class);
     }
 
     protected <T, R> void map(final T input,
