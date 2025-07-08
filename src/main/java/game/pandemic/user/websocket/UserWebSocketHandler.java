@@ -8,7 +8,9 @@ import game.pandemic.websocket.WebSocketSessionRegistry;
 import game.pandemic.websocket.auth.IWebSocketAuthenticationObjectRepository;
 import game.pandemic.websocket.endpoint.IWebSocketController;
 import game.pandemic.websocket.endpoint.WebSocketHandler;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.List;
@@ -34,5 +36,24 @@ public class UserWebSocketHandler extends WebSocketHandler<User> {
     @Override
     public String getEndpointMapping() {
         return "/user";
+    }
+
+    @Override
+    protected void handleAuthenticationSuccess(final WebSocketSession session, final User user) {
+        super.handleAuthenticationSuccess(session, user);
+        sendMessageWithAllUsersToAllUsers();
+    }
+
+    @Override
+    public void afterConnectionClosed(@NonNull final WebSocketSession session, @NonNull final CloseStatus status) {
+        super.afterConnectionClosed(session, status);
+        sendMessageWithAllUsersToAllUsers();
+    }
+
+    protected void sendMessageWithAllUsersToAllUsers() {
+        this.webSocketSessionMessenger.multicast(
+                this.webSocketSessionRegistry.findAllSessions(),
+                this.webSocketSessionRegistry.findAllAuthenticationObjects()
+        );
     }
 }
