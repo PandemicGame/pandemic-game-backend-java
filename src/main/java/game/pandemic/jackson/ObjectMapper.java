@@ -1,11 +1,14 @@
 package game.pandemic.jackson;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -19,6 +22,12 @@ public class ObjectMapper {
     @FunctionalInterface
     protected interface MappingFunction<T, R> {
         R apply(final T t) throws IOException;
+    }
+
+    @RequiredArgsConstructor
+    @Getter
+    protected static class CollectionSerializationException extends RuntimeException {
+        private final IOException cause;
     }
 
     protected static final BiConsumer<Object, IOException> DEFAULT_SERIALIZATION_EXCEPTION_HANDLER =
@@ -53,12 +62,42 @@ public class ObjectMapper {
         );
     }
 
-    protected String serialize(final Object object, final Class<? extends JacksonView.Any> view) throws JsonProcessingException {
-        return this.mapper.writerWithView(view).writeValueAsString(object);
+    protected String serialize(final Object object, final Class<? extends JacksonView.Any> view) throws IOException {
+        return serialize(object, o -> this.mapper.writerWithView(view).writeValueAsString(o));
     }
 
-    protected String serialize(final Object object) throws JsonProcessingException {
-        return this.mapper.writeValueAsString(object);
+    protected String serialize(final Object object) throws IOException {
+        return serialize(object, this.mapper::writeValueAsString);
+    }
+
+    protected String serialize(final Object object,
+                               final MappingFunction<Object, String> serializer) throws IOException {
+        if (object instanceof Collection<?> collection) {
+            return serializeCollection(collection, serializer);
+        } else {
+            return serializer.apply(object);
+        }
+    }
+
+    protected String serializeCollection(final Collection<?> collection,
+                                         final MappingFunction<Object, String> serializer) throws IOException {
+        try {
+            final List<String> serializedElements = collection.stream()
+                    .map(element -> serializeCollectionElement(element, serializer))
+                    .toList();
+            return "[" + String.join(",", serializedElements) + "]";
+        } catch (final CollectionSerializationException e) {
+            throw e.getCause();
+        }
+    }
+
+    protected String serializeCollectionElement(final Object element,
+                                                final MappingFunction<Object, String> serializer) throws CollectionSerializationException {
+        try {
+            return serializer.apply(element);
+        } catch (final IOException e) {
+            throw new CollectionSerializationException(e);
+        }
     }
 
     public <T> void deserialize(final String string,
