@@ -66,7 +66,7 @@ public class ObjectMapper {
     }
 
     protected String serialize(final Object object) throws IOException {
-        return serialize(object, Object.class);
+        return serialize(object, this.mapper::writeValueAsString);
     }
 
     protected String serialize(final Object object,
@@ -127,7 +127,7 @@ public class ObjectMapper {
     }
 
     protected <T> T deserialize(final String string, final Class<T> targetClass) throws IOException {
-        return deserialize(string, targetClass, Object.class);
+        return this.mapper.readValue(string, targetClass);
     }
 
     protected <T, R> void map(final T input,
