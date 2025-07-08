@@ -1,5 +1,6 @@
 package game.pandemic.chat.message;
 
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import game.pandemic.chat.ChatMessageSender;
 import game.pandemic.chat.chats.Chat;
@@ -27,6 +28,7 @@ public class ChatMessage implements IWebSocketData {
     @Setter
     @ManyToOne
     @JsonView(JacksonView.Read.class)
+    @JsonIdentityReference(alwaysAsId = true)
     private Chat chat;
     @Getter
     @Transient

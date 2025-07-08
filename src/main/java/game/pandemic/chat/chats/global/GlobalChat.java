@@ -11,6 +11,8 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GlobalChat extends Chat {
+    public static final String GLOBAL_CHAT_IDENTIFIER = "GLOBAL";
+
     public GlobalChat(final Set<ChatMessageSender> members) {
         super(members);
     }
