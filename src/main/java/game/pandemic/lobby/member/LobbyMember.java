@@ -10,11 +10,13 @@ import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public abstract class LobbyMember extends ChatMessageSender {
+    @Setter
     @ManyToOne
     @JsonView(JacksonView.Read.class)
     @JsonIdentityReference(alwaysAsId = true)
