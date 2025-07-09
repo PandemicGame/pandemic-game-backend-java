@@ -42,6 +42,7 @@ public class Lobby implements IWebSocketData {
     }
 
     public void addMember(final LobbyMember member) {
+        member.setLobby(this);
         this.members.add(member);
     }
 }
