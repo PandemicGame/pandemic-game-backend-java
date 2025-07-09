@@ -1,5 +1,6 @@
 package game.pandemic.lobby;
 
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.lobby.member.LobbyMember;
@@ -24,6 +25,7 @@ public class Lobby implements IWebSocketData {
     private String name;
     @OneToOne
     @JsonView(JacksonView.Read.class)
+    @JsonIdentityReference(alwaysAsId = true)
     private UserLobbyMember owner;
     @Getter
     @OneToMany(mappedBy = "lobby", cascade = CascadeType.ALL, orphanRemoval = true)
