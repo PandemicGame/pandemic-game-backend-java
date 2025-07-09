@@ -5,7 +5,7 @@ import game.pandemic.messaging.messengers.IUnicastMessenger;
 
 import java.util.function.BiPredicate;
 
-public interface IUnicastMessengerDelegator<T> extends IUnicastMessenger<T> {
+public interface IUnicastMessengerDelegator<T> extends IUnicastMessenger<T>, IMessengerDelegator<T> {
     <C extends T> boolean delegateUnicast(final T target, final BiPredicate<C, IUnicastMessenger<C>> unicastFunction);
 
     @Override
