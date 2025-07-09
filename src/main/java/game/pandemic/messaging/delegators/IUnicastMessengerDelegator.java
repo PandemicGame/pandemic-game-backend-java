@@ -3,10 +3,23 @@ package game.pandemic.messaging.delegators;
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.messaging.messengers.IUnicastMessenger;
 
+import java.util.Map;
 import java.util.function.BiPredicate;
 
 public interface IUnicastMessengerDelegator<T> extends IUnicastMessenger<T>, IMessengerDelegator<T> {
-    <C extends T> boolean delegateUnicast(final T target, final BiPredicate<C, IUnicastMessenger<C>> unicastFunction);
+    Map<Class<? extends T>, IUnicastMessenger<? extends T>> getUnicastMessengersForTypes();
+
+    @SuppressWarnings("unchecked")
+    default boolean delegateUnicast(final T target, final BiPredicate<T, IUnicastMessenger<T>> unicastFunction) {
+        final Map<Class<? extends T>, IUnicastMessenger<? extends T>> unicastMessengerMap = getUnicastMessengersForTypes();
+        if (target != null) {
+            final IUnicastMessenger<? extends T> messenger = unicastMessengerMap.get(target.getClass());
+            if (messenger != null) {
+                unicastFunction.test(target, (IUnicastMessenger<T>) messenger);
+            }
+        }
+        return false;
+    }
 
     @Override
     default boolean unicast(final T target, final Object message, final Class<? extends JacksonView.Any> view) {
