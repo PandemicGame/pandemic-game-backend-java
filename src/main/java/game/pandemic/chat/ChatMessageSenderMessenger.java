@@ -1,5 +1,7 @@
 package game.pandemic.chat;
 
+import game.pandemic.lobby.member.UserLobbyMember;
+import game.pandemic.lobby.websocket.UserLobbyMemberWebSocketMessenger;
 import game.pandemic.messaging.delegators.IGeneralPurposeMessengerDelegator;
 import game.pandemic.messaging.messengers.IBroadcastMessenger;
 import game.pandemic.messaging.messengers.IMulticastMessenger;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ChatMessageSenderMessenger implements IGeneralPurposeMessengerDelegator<ChatMessageSender> {
     private final UserWebSocketMessenger userWebSocketMessenger;
+    private final UserLobbyMemberWebSocketMessenger userLobbyMemberWebSocketMessenger;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -30,6 +33,9 @@ public class ChatMessageSenderMessenger implements IGeneralPurposeMessengerDeleg
     ) {
         if (target instanceof User user) {
             return unicastFunction.test((C) user, (IUnicastMessenger<C>) this.userWebSocketMessenger);
+        }
+        if (target instanceof UserLobbyMember userLobbyMember) {
+            return unicastFunction.test((C) userLobbyMember, (IUnicastMessenger<C>) this.userLobbyMemberWebSocketMessenger);
         }
         return false;
     }
@@ -46,6 +52,12 @@ public class ChatMessageSenderMessenger implements IGeneralPurposeMessengerDeleg
                 .collect(Collectors.toSet());
         final Map<ChatMessageSender, Boolean> targetsWithSuccessStatus =
                 new HashMap<>(multicastFunction.apply(users, (IMulticastMessenger<C>) this.userWebSocketMessenger));
+
+        final Set<C> userLobbyMembers = (Set<C>) targets.stream()
+                .filter(UserLobbyMember.class::isInstance)
+                .map(UserLobbyMember.class::cast)
+                .collect(Collectors.toSet());
+        targetsWithSuccessStatus.putAll(multicastFunction.apply(userLobbyMembers, (IMulticastMessenger<C>) this.userLobbyMemberWebSocketMessenger));
 
         targets.stream()
                 .filter(target -> !(target instanceof User))

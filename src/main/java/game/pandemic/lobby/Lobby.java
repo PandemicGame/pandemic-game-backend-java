@@ -2,6 +2,7 @@ package game.pandemic.lobby;
 
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonView;
+import game.pandemic.chat.chats.LobbyChat;
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.lobby.member.LobbyMember;
 import game.pandemic.lobby.member.UserLobbyMember;
@@ -31,11 +32,16 @@ public class Lobby implements IWebSocketData {
     @OneToMany(mappedBy = "lobby", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonView(JacksonView.Read.class)
     private Set<LobbyMember> members;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JsonView(JacksonView.Read.class)
+    @JsonIdentityReference(alwaysAsId = true)
+    private LobbyChat chat;
 
     public Lobby(final String name, final UserLobbyMember owner) {
         this.name = name;
         this.owner = owner;
         this.members = new HashSet<>();
+        this.chat = new LobbyChat(this);
         addMember(owner);
     }
 
@@ -46,5 +52,6 @@ public class Lobby implements IWebSocketData {
     public void addMember(final LobbyMember member) {
         member.setLobby(this);
         this.members.add(member);
+        this.chat.addMember(member);
     }
 }
