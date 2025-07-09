@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
-public interface IMulticastMessenger<T> {
+public interface IMulticastMessenger<T> extends IMessenger<T> {
     Map<T, Boolean> multicast(final Set<T> targets, final Object message, final Class<? extends JacksonView.Any> view);
     Map<T, Boolean> multicast(final Set<T> targets, final Object message);
     Map<T, Boolean> multicast(final Set<T> targets, final String message);

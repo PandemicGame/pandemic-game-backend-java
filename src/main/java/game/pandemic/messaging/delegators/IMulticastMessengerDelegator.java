@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
 
-public interface IMulticastMessengerDelegator<T> extends IMulticastMessenger<T> {
+public interface IMulticastMessengerDelegator<T> extends IMulticastMessenger<T>, IMessengerDelegator<T> {
     <C extends T> Map<T, Boolean> delegateMulticast(final Set<T> targets, final BiFunction<Set<C>, IMulticastMessenger<C>, Map<C, Boolean>> multicastFunction);
 
     @Override

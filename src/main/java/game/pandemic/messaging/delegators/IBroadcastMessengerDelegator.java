@@ -6,7 +6,7 @@ import game.pandemic.messaging.messengers.IBroadcastMessenger;
 import java.util.Map;
 import java.util.function.Function;
 
-public interface IBroadcastMessengerDelegator<T> extends IBroadcastMessenger<T> {
+public interface IBroadcastMessengerDelegator<T> extends IBroadcastMessenger<T>, IMessengerDelegator<T> {
     <C extends T> Map<T, Boolean> delegateBroadcast(final Function<IBroadcastMessenger<C>, Map<C, Boolean>> broadcastFunction);
 
     @Override
