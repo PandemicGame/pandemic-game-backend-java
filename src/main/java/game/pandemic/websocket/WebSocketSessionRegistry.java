@@ -36,7 +36,7 @@ public abstract class WebSocketSessionRegistry<A extends IWebSocketAuthenticatio
     }
 
     public Set<WebSocketSession> findSessionsForAuthenticationObject(final A authenticationObject) {
-        return this.authenticationObjectToSessions.get(authenticationObject.getId());
+        return this.authenticationObjectToSessions.getOrDefault(authenticationObject.getId(), new HashSet<>());
     }
 
     public Optional<A> findAuthenticationObjectForSession(final WebSocketSession session) {
