@@ -6,12 +6,10 @@ import game.pandemic.jackson.JacksonView;
 import game.pandemic.lobby.Lobby;
 import lombok.RequiredArgsConstructor;
 
-import java.util.UUID;
-
 @RequiredArgsConstructor
 public class LobbyAndAccessTokenHolder implements IJsonTypeInfo {
     @JsonView(JacksonView.Read.class)
     private final Lobby lobby;
     @JsonView(JacksonView.Read.class)
-    private final UUID accessToken;
+    private final String accessToken;
 }

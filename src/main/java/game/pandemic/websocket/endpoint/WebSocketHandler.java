@@ -4,8 +4,8 @@ import game.pandemic.jackson.ObjectMapper;
 import game.pandemic.messaging.messengers.IUnicastAndMulticastMessenger;
 import game.pandemic.validation.ValidationService;
 import game.pandemic.websocket.WebSocketSessionRegistry;
+import game.pandemic.websocket.auth.AccessTokenService;
 import game.pandemic.websocket.auth.IWebSocketAuthenticationObject;
-import game.pandemic.websocket.auth.IWebSocketAuthenticationObjectRepository;
 import game.pandemic.websocket.message.WebSocketMessage;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,6 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.util.List;
-import java.util.UUID;
 
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Log4j2
@@ -26,7 +25,7 @@ public abstract class WebSocketHandler<A extends IWebSocketAuthenticationObject>
 
     protected final WebSocketSessionRegistry<A> webSocketSessionRegistry;
     protected final IUnicastAndMulticastMessenger<WebSocketSession> webSocketSessionMessenger;
-    protected final IWebSocketAuthenticationObjectRepository<A> webSocketAuthenticationObjectRepository;
+    protected final AccessTokenService<A> accessTokenService;
     protected final List<IWebSocketController<A>> webSocketControllers;
     protected final ObjectMapper objectMapper;
     protected final ValidationService validationService;
@@ -68,8 +67,8 @@ public abstract class WebSocketHandler<A extends IWebSocketAuthenticationObject>
     }
 
     protected void handleAuthentication(final WebSocketSession session, final WebSocketMessage webSocketMessage) {
-        final UUID accessToken = UUID.fromString(webSocketMessage.getPayload());
-        this.webSocketAuthenticationObjectRepository.findByAccessToken(accessToken).ifPresentOrElse(
+        final String accessToken = webSocketMessage.getPayload();
+        this.accessTokenService.parseAccessTokenToObject(accessToken).ifPresentOrElse(
                 a -> handleAuthenticationSuccess(session, a),
                 () -> handleAuthenticationError(session)
         );

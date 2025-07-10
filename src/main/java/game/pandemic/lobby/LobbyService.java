@@ -8,13 +8,13 @@ import game.pandemic.lobby.websocket.LobbyAndAccessTokenHolder;
 import game.pandemic.messaging.messengers.IMulticastMessenger;
 import game.pandemic.messaging.messengers.IUnicastMessenger;
 import game.pandemic.user.User;
+import game.pandemic.websocket.auth.AccessTokenService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -22,6 +22,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 @Log4j2
 public class LobbyService {
+    private final AccessTokenService<UserLobbyMember> accessTokenService;
     private final LobbyRepository lobbyRepository;
     private final LobbyMemberRepository lobbyMemberRepository;
     private final IUnicastMessenger<User> userMessenger;
@@ -83,7 +84,6 @@ public class LobbyService {
 
     private UserLobbyMember createUserLobbyMember(final User user) {
         final UserLobbyMember userLobbyMember = new UserLobbyMember(user);
-        userLobbyMember.setAccessToken(UUID.randomUUID());
         return this.lobbyMemberRepository.save(userLobbyMember);
     }
 
@@ -98,7 +98,7 @@ public class LobbyService {
 
     private LobbyAndAccessTokenHolder createLobbyAndAccessTokenHolder(final UserLobbyMember userLobbyMember,
                                                                       final Lobby lobby) {
-        return new LobbyAndAccessTokenHolder(lobby, userLobbyMember.getAccessToken());
+        return new LobbyAndAccessTokenHolder(lobby, this.accessTokenService.createAccessTokenForObject(userLobbyMember));
     }
 
     @Transactional

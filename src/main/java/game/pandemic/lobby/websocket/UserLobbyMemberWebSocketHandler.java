@@ -6,7 +6,7 @@ import game.pandemic.lobby.member.UserLobbyMember;
 import game.pandemic.messaging.messengers.IUnicastAndMulticastMessenger;
 import game.pandemic.validation.ValidationService;
 import game.pandemic.websocket.WebSocketSessionRegistry;
-import game.pandemic.websocket.auth.IWebSocketAuthenticationObjectRepository;
+import game.pandemic.websocket.auth.AccessTokenService;
 import game.pandemic.websocket.endpoint.IWebSocketController;
 import game.pandemic.websocket.endpoint.WebSocketHandler;
 import org.springframework.lang.NonNull;
@@ -22,7 +22,7 @@ public class UserLobbyMemberWebSocketHandler extends WebSocketHandler<UserLobbyM
 
     public UserLobbyMemberWebSocketHandler(final WebSocketSessionRegistry<UserLobbyMember> webSocketSessionRegistry,
                                            final IUnicastAndMulticastMessenger<WebSocketSession> webSocketSessionMessenger,
-                                           final IWebSocketAuthenticationObjectRepository<UserLobbyMember> webSocketAuthenticationObjectRepository,
+                                           final AccessTokenService<UserLobbyMember> accessTokenService,
                                            final List<IWebSocketController<UserLobbyMember>> iWebSocketControllers,
                                            final ObjectMapper objectMapper,
                                            final ValidationService validationService,
@@ -30,7 +30,7 @@ public class UserLobbyMemberWebSocketHandler extends WebSocketHandler<UserLobbyM
         super(
                 webSocketSessionRegistry,
                 webSocketSessionMessenger,
-                webSocketAuthenticationObjectRepository,
+                accessTokenService,
                 iWebSocketControllers,
                 objectMapper,
                 validationService
