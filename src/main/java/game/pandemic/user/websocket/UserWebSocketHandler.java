@@ -6,7 +6,7 @@ import game.pandemic.messaging.messengers.IUnicastAndMulticastMessenger;
 import game.pandemic.user.User;
 import game.pandemic.validation.ValidationService;
 import game.pandemic.websocket.WebSocketSessionRegistry;
-import game.pandemic.websocket.auth.IWebSocketAuthenticationObjectRepository;
+import game.pandemic.websocket.auth.AccessTokenService;
 import game.pandemic.websocket.endpoint.IWebSocketController;
 import game.pandemic.websocket.endpoint.WebSocketHandler;
 import org.springframework.lang.NonNull;
@@ -20,14 +20,14 @@ import java.util.List;
 public class UserWebSocketHandler extends WebSocketHandler<User> {
     public UserWebSocketHandler(final WebSocketSessionRegistry<User> webSocketSessionRegistry,
                                 final IUnicastAndMulticastMessenger<WebSocketSession> webSocketSessionMessenger,
-                                final IWebSocketAuthenticationObjectRepository<User> webSocketAuthenticationObjectRepository,
+                                final AccessTokenService<User> accessTokenService,
                                 final List<IWebSocketController<User>> webSocketControllers,
                                 final ObjectMapper objectMapper,
                                 final ValidationService validationService) {
         super(
                 webSocketSessionRegistry,
                 webSocketSessionMessenger,
-                webSocketAuthenticationObjectRepository,
+                accessTokenService,
                 webSocketControllers,
                 objectMapper,
                 validationService

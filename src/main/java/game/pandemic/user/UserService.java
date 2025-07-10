@@ -2,21 +2,22 @@ package game.pandemic.user;
 
 import game.pandemic.auth.Account;
 import game.pandemic.chat.chats.global.GlobalChatService;
+import game.pandemic.websocket.auth.AccessTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    private final AccessTokenService<User> accessTokenService;
     private final GlobalChatService globalChatService;
     private final UserRepository userRepository;
 
     public String getAccessTokenForRegisteredUser(final Account account) {
         final User user = getOrCreateUserForAccount(account);
-        return user.getAccessTokenString();
+        return this.accessTokenService.createAccessTokenForObject(user);
     }
 
     private User getOrCreateUserForAccount(final Account account) {
@@ -30,7 +31,6 @@ public class UserService {
     }
 
     private User generateAccessTokenAndSaveUser(final User user) {
-        user.setAccessToken(UUID.randomUUID());
         final User saved = this.userRepository.save(user);
         this.globalChatService.addMember(saved);
         return saved;
@@ -38,7 +38,7 @@ public class UserService {
 
     public String getAccessTokenForGuestUser(final String username) {
         final User user = createUserWithUsername(username);
-        return user.getAccessTokenString();
+        return this.accessTokenService.createAccessTokenForObject(user);
     }
 
     private User createUserWithUsername(final String username) {
@@ -46,7 +46,7 @@ public class UserService {
         return generateAccessTokenAndSaveUser(user);
     }
 
-    public Optional<User> findUserByAccessToken(final UUID accessToken) {
-        return this.userRepository.findUserByAccessToken(accessToken);
+    public Optional<User> findUserByAccessToken(final String accessToken) {
+        return this.accessTokenService.parseAccessTokenToObject(accessToken);
     }
 }
