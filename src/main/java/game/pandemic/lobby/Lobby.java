@@ -22,6 +22,7 @@ public class Lobby implements IWebSocketData {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonView(JacksonView.Read.class)
     private Long id;
+    @Getter
     @JsonView(JacksonView.Read.class)
     private String name;
     @OneToOne
@@ -53,5 +54,11 @@ public class Lobby implements IWebSocketData {
         member.setLobby(this);
         this.members.add(member);
         this.chat.addMember(member);
+    }
+
+    public void removeMember(final LobbyMember member) {
+        member.setLobby(null);
+        this.members.remove(member);
+        this.chat.removeMember(member);
     }
 }
