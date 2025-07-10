@@ -30,7 +30,7 @@ public class Lobby implements IWebSocketData {
     @JsonIdentityReference(alwaysAsId = true)
     private UserLobbyMember owner;
     @Getter
-    @OneToMany(mappedBy = "lobby", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "lobby", cascade = CascadeType.ALL)
     @JsonView(JacksonView.Read.class)
     private Set<LobbyMember> members;
     @OneToOne(cascade = CascadeType.ALL)
