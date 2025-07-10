@@ -1,31 +1,27 @@
 package game.pandemic.websocket.auth;
 
-import game.pandemic.jackson.JacksonView;
 import game.pandemic.jackson.ObjectMapper;
-import game.pandemic.messaging.messengers.IGeneralPurposeMessenger;
 import game.pandemic.messaging.messengers.IMulticastMessenger;
+import game.pandemic.messaging.messengers.serialization.IGeneralPurposeMessengerWithSerialization;
+import game.pandemic.messaging.messengers.serialization.MessengerWithSerialization;
 import game.pandemic.websocket.WebSocketSessionRegistry;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class WebSocketAuthenticationObjectMessenger<A extends IWebSocketAuthenticationObject> implements IGeneralPurposeMessenger<A> {
+public abstract class WebSocketAuthenticationObjectMessenger<A extends IWebSocketAuthenticationObject> extends MessengerWithSerialization<A> implements IGeneralPurposeMessengerWithSerialization<A> {
     protected final WebSocketSessionRegistry<A> webSocketSessionRegistry;
     protected final IMulticastMessenger<WebSocketSession> webSocketMessenger;
-    protected final ObjectMapper objectMapper;
 
-    @Override
-    public boolean unicast(final A target, final Object message, final Class<? extends JacksonView.Any> view) {
-        return this.objectMapper.serialize(message, view, s -> unicast(target, s), () -> false);
-    }
-
-    @Override
-    public boolean unicast(final A target, final Object message) {
-        return this.objectMapper.serialize(message, s -> unicast(target, s), () -> false);
+    protected WebSocketAuthenticationObjectMessenger(final WebSocketSessionRegistry<A> webSocketSessionRegistry,
+                                                     final IMulticastMessenger<WebSocketSession> webSocketMessenger,
+                                                     final ObjectMapper objectMapper) {
+        super(objectMapper);
+        this.webSocketSessionRegistry = webSocketSessionRegistry;
+        this.webSocketMessenger = webSocketMessenger;
     }
 
     @Override
@@ -36,32 +32,19 @@ public abstract class WebSocketAuthenticationObjectMessenger<A extends IWebSocke
     }
 
     @Override
-    public Map<A, Boolean> multicast(final Set<A> targets, final Object message, final Class<? extends JacksonView.Any> view) {
-        return this.objectMapper.serialize(message, view, s -> multicast(targets, s), () -> multicastFailure(targets));
-    }
-
-    @Override
-    public Map<A, Boolean> multicast(final Set<A> targets, final Object message) {
-        return this.objectMapper.serialize(message, s -> multicast(targets, s), () -> multicastFailure(targets));
-    }
-
-    @Override
     public Map<A, Boolean> multicast(final Set<A> targets, final String message) {
         return multicastEvaluation(targets, t -> unicast(t, message));
     }
 
     @Override
-    public Map<A, Boolean> broadcast(final Object message, final Class<? extends JacksonView.Any> view) {
-        return multicast(this.webSocketSessionRegistry.findAllAuthenticationObjects(), message, view);
-    }
-
-    @Override
-    public Map<A, Boolean> broadcast(final Object message) {
-        return multicast(this.webSocketSessionRegistry.findAllAuthenticationObjects(), message);
-    }
-
-    @Override
     public Map<A, Boolean> broadcast(final String message) {
         return multicast(this.webSocketSessionRegistry.findAllAuthenticationObjects(), message);
+    }
+
+    @Override
+    public Map<A, Boolean> broadcastFailure() {
+        return this.webSocketSessionRegistry.findAllAuthenticationObjects().stream()
+                .map(authenticationObject -> new AbstractMap.SimpleEntry<>(authenticationObject, false))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }
