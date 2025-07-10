@@ -40,4 +40,8 @@ public abstract class Chat implements IWebSocketData {
     public void addMember(final ChatMessageSender member) {
         this.members.add(member);
     }
+
+    public void removeMember(final ChatMessageSender member) {
+        this.members.remove(member);
+    }
 }

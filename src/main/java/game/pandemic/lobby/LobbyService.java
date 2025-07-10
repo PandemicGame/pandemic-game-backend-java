@@ -97,4 +97,17 @@ public class LobbyService {
                                                                       final Lobby lobby) {
         return new LobbyAndAccessTokenHolder(lobby, userLobbyMember.getAccessToken());
     }
+
+    @Transactional
+    public void leaveLobby(final UserLobbyMember userLobbyMember) {
+        this.lobbyRepository.findLobbyByMembersContaining(userLobbyMember).ifPresent(lobby -> {
+            lobby.removeMember(userLobbyMember);
+
+            final Lobby saved = this.lobbyRepository.save(lobby);
+
+            log.info("UserLobbyMember \"" + userLobbyMember.getName() + "\" left the lobby \"" + saved.getName() + "\".");
+
+            sendLobbyToMembers(saved);
+        });
+    }
 }
