@@ -1,4 +1,6 @@
 package game.pandemic.messaging.messengers.serialization;
 
-public interface IGeneralPurposeMessengerWithSerialization<T> extends IUnicastAndMulticastMessengerWithSerialization<T>, IBroadcastMessengerWithSerialization<T> {
+import game.pandemic.messaging.messengers.IGeneralPurposeMessenger;
+
+public interface IGeneralPurposeMessengerWithSerialization<T> extends IGeneralPurposeMessenger<T>, IUnicastAndMulticastMessengerWithSerialization<T>, IBroadcastMessengerWithSerialization<T> {
 }
