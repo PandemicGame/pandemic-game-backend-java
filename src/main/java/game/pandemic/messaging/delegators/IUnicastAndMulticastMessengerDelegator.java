@@ -6,6 +6,7 @@ import game.pandemic.messaging.messengers.IUnicastMessenger;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public interface IUnicastAndMulticastMessengerDelegator<T> extends IUnicastAndMulticastMessenger<T>, IUnicastMessengerDelegator<T>, IMulticastMessengerDelegator<T> {
     Map<Class<? extends T>, IUnicastAndMulticastMessenger<? extends T>> getUnicastAndMulticastMessengersForTypes();
@@ -18,5 +19,10 @@ public interface IUnicastAndMulticastMessengerDelegator<T> extends IUnicastAndMu
     @Override
     default Map<Class<? extends T>, IMulticastMessenger<? extends T>> getMulticastMessengersForTypes() {
         return new HashMap<>(getUnicastAndMulticastMessengersForTypes());
+    }
+
+    @Override
+    default Map<T, Boolean> multicast(final Set<T> targets, final String message) {
+        return IMulticastMessengerDelegator.super.multicast(targets, message);
     }
 }

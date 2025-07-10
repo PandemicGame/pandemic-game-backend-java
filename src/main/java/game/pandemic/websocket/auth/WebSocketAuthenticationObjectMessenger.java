@@ -32,11 +32,6 @@ public abstract class WebSocketAuthenticationObjectMessenger<A extends IWebSocke
     }
 
     @Override
-    public Map<A, Boolean> multicast(final Set<A> targets, final String message) {
-        return multicastEvaluation(targets, t -> unicast(t, message));
-    }
-
-    @Override
     public Map<A, Boolean> broadcast(final String message) {
         return multicast(this.webSocketSessionRegistry.findAllAuthenticationObjects(), message);
     }
