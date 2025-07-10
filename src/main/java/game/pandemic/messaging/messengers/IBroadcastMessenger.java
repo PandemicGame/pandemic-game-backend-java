@@ -8,4 +8,8 @@ public interface IBroadcastMessenger<T> extends IMessenger<T> {
     Map<T, Boolean> broadcast(final Object message, final Class<? extends JacksonView.Any> view);
     Map<T, Boolean> broadcast(final Object message);
     Map<T, Boolean> broadcast(final String message);
+
+    default Map<T, Boolean> broadcastFailure() {
+        return Map.of();
+    }
 }
