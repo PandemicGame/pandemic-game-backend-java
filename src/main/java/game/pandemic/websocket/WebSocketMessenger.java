@@ -9,8 +9,6 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
 
 @Component
 @Log4j2
@@ -28,10 +26,5 @@ public class WebSocketMessenger extends MessengerWithSerialization<WebSocketSess
             log.warn("An Exception occurred during sending of message to session: " + target.getId());
             return false;
         }
-    }
-
-    @Override
-    public Map<WebSocketSession, Boolean> multicast(final Set<WebSocketSession> targets, final String message) {
-        return multicastEvaluation(targets, t -> unicast(t, message));
     }
 }
