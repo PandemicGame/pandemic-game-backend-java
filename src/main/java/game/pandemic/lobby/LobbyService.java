@@ -36,10 +36,7 @@ public class LobbyService {
     public void joinLobby(final User user, final String lobbyId) {
         findLobbyAndExecute(lobbyId, lobby -> addUserToLobbyAndProceed(
                 user,
-                m -> {
-                    lobby.addMember(m);
-                    return lobby;
-                },
+                m -> addMemberToLobby(lobby, m),
                 this::sendLobbyToMembers
         ));
     }
@@ -49,6 +46,12 @@ public class LobbyService {
             final Long id = Long.parseLong(lobbyId);
             this.lobbyRepository.findById(id).ifPresent(callback);
         }
+    }
+
+    private Lobby addMemberToLobby(final Lobby lobby, final LobbyMember member) {
+        lobby.addMember(member);
+        log.info("LobbyMember \"" + member.getName() + "\" joined the lobby \"" + lobby.getName() + "\".");
+        return lobby;
     }
 
     private void sendLobbyToMembers(final Lobby lobby) {
