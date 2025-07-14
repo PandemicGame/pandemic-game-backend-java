@@ -106,6 +106,8 @@ public class LobbyService {
         this.lobbyRepository.findLobbyByMembersContaining(userLobbyMember).ifPresent(lobby -> {
             lobby.removeMember(userLobbyMember);
 
+            this.lobbyMemberRepository.detachLobby(userLobbyMember.getId());
+
             final Lobby saved = this.lobbyRepository.save(lobby);
 
             log.info("UserLobbyMember \"" + userLobbyMember.getName() + "\" left the lobby \"" + saved.getName() + "\".");
