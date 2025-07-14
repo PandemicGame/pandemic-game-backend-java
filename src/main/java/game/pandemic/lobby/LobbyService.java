@@ -1,6 +1,9 @@
 package game.pandemic.lobby;
 
 import game.pandemic.jackson.JacksonView;
+import game.pandemic.lobby.events.CreateLobbyEvent;
+import game.pandemic.lobby.events.JoinLobbyEvent;
+import game.pandemic.lobby.events.LeaveLobbyEvent;
 import game.pandemic.lobby.member.LobbyMember;
 import game.pandemic.lobby.member.LobbyMemberRepository;
 import game.pandemic.lobby.member.UserLobbyMember;
@@ -50,7 +53,7 @@ public class LobbyService {
     }
 
     private Lobby addMemberToLobby(final Lobby lobby, final LobbyMember member) {
-        lobby.addMember(member);
+        lobby.processEvent(new JoinLobbyEvent(member));
         log.info("LobbyMember \"" + member.getName() + "\" joined the lobby \"" + lobby.getName() + "\".");
         return lobby;
     }
@@ -67,7 +70,7 @@ public class LobbyService {
     public void createLobby(final User user, final String name) {
         addUserToLobbyAndProceed(
                 user,
-                m -> new Lobby(name, m),
+                m -> new CreateLobbyEvent(name, m).createLobby(),
                 l -> log.info("Created lobby with name: " + name)
         );
     }
@@ -103,16 +106,18 @@ public class LobbyService {
 
     @Transactional
     public void leaveLobby(final UserLobbyMember userLobbyMember) {
-        this.lobbyRepository.findLobbyByMembersContaining(userLobbyMember).ifPresent(lobby -> {
-            lobby.removeMember(userLobbyMember);
+        this.lobbyRepository.findLobbyByMembersContaining(userLobbyMember).ifPresent(lobby -> leaveLobby(lobby, userLobbyMember));
+    }
 
-            this.lobbyMemberRepository.detachLobby(userLobbyMember.getId());
+    private void leaveLobby(final Lobby lobby, final LobbyMember lobbyMember) {
+        lobby.processEvent(new LeaveLobbyEvent(lobbyMember));
 
-            final Lobby saved = this.lobbyRepository.save(lobby);
+        this.lobbyMemberRepository.detachLobby(lobbyMember.getId());
 
-            log.info("UserLobbyMember \"" + userLobbyMember.getName() + "\" left the lobby \"" + saved.getName() + "\".");
+        final Lobby saved = this.lobbyRepository.save(lobby);
 
-            sendLobbyToMembers(saved);
-        });
+        log.info("LobbyMember \"" + lobbyMember.getName() + "\" left lobby \"" + saved.getName() + "\".");
+
+        sendLobbyToMembers(saved);
     }
 }
