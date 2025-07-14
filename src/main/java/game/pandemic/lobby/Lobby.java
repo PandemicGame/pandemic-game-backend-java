@@ -3,7 +3,10 @@ package game.pandemic.lobby;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import game.pandemic.chat.chats.LobbyChat;
+import game.pandemic.event.IEventContext;
 import game.pandemic.jackson.JacksonView;
+import game.pandemic.lobby.events.CreateLobbyEvent;
+import game.pandemic.lobby.events.LobbyEvent;
 import game.pandemic.lobby.member.LobbyMember;
 import game.pandemic.lobby.member.UserLobbyMember;
 import game.pandemic.websocket.IWebSocketData;
@@ -11,20 +14,23 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Lobby implements IWebSocketData {
+public class Lobby implements IWebSocketData, IEventContext<Lobby, LobbyEvent> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonView(JacksonView.Read.class)
     private Long id;
     @Getter
+    @Setter
     @JsonView(JacksonView.Read.class)
     private String name;
+    @Setter
     @OneToOne
     @JsonView(JacksonView.Read.class)
     @JsonIdentityReference(alwaysAsId = true)
@@ -37,13 +43,35 @@ public class Lobby implements IWebSocketData {
     @JsonView(JacksonView.Read.class)
     @JsonIdentityReference(alwaysAsId = true)
     private LobbyChat chat;
+    @OneToOne(cascade = CascadeType.ALL)
+    private CreateLobbyEvent creationEvent;
 
-    public Lobby(final String name, final UserLobbyMember owner) {
-        this.name = name;
-        this.owner = owner;
-        this.members = new HashSet<>();
+    public Lobby(final CreateLobbyEvent creationEvent) {
+        initialize();
         this.chat = new LobbyChat(this);
-        addMember(owner);
+        this.creationEvent = creationEvent;
+        this.creationEvent.apply(this);
+    }
+
+    private void initialize() {
+        this.members = new HashSet<>();
+    }
+
+    @Override
+    public void processEvent(final LobbyEvent event) {
+        this.creationEvent.appendEvent(event);
+        event.apply(this);
+    }
+
+    @Override
+    public void reset() {
+        initialize();
+        this.creationEvent.apply(this);
+    }
+
+    @Override
+    public void restore() {
+        this.creationEvent.applyAll(this);
     }
 
     public boolean containsMember(final LobbyMember member) {
