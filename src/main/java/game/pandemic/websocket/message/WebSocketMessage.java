@@ -2,7 +2,6 @@ package game.pandemic.websocket.message;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
@@ -15,7 +14,6 @@ public class WebSocketMessage {
     @JsonProperty
     @Pattern(regexp = "^(/[\\w-]+)+$")
     private String destination;
-    @NotBlank
     private String payload;
 
     @JsonProperty("payload")
