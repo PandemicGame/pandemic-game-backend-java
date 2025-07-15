@@ -16,5 +16,9 @@ public class LeaveLobbyEvent extends LobbyMemberEvent {
     @Override
     public void apply(final Lobby lobby) {
         lobby.removeMember(this.lobbyMember);
+
+        if (lobby.isOwner(this.lobbyMember)) {
+            lobby.processEvent(new CloseLobbyEvent());
+        }
     }
 }

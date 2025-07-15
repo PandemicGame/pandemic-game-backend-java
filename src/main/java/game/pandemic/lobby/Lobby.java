@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,7 +36,6 @@ public class Lobby implements IWebSocketData, IEventContext<Lobby, LobbyEvent> {
     @JsonView(JacksonView.Read.class)
     @JsonIdentityReference(alwaysAsId = true)
     private UserLobbyMember owner;
-    @Getter
     @OneToMany(mappedBy = "lobby", cascade = CascadeType.ALL)
     @JsonView(JacksonView.Read.class)
     private Set<LobbyMember> members;
@@ -45,6 +45,10 @@ public class Lobby implements IWebSocketData, IEventContext<Lobby, LobbyEvent> {
     private LobbyChat chat;
     @OneToOne(cascade = CascadeType.ALL)
     private CreateLobbyEvent creationEvent;
+    @Getter
+    @Setter
+    @JsonView(JacksonView.Read.class)
+    private boolean isClosed;
 
     public Lobby(final CreateLobbyEvent creationEvent) {
         initialize();
@@ -55,6 +59,7 @@ public class Lobby implements IWebSocketData, IEventContext<Lobby, LobbyEvent> {
 
     private void initialize() {
         this.members = new HashSet<>();
+        this.isClosed = false;
     }
 
     @Override
@@ -74,6 +79,17 @@ public class Lobby implements IWebSocketData, IEventContext<Lobby, LobbyEvent> {
         this.creationEvent.applyAll(this);
     }
 
+    public boolean isOwner(final LobbyMember lobbyMember) {
+        if (lobbyMember instanceof UserLobbyMember userLobbyMember) {
+            return isOwner(userLobbyMember);
+        }
+        return false;
+    }
+
+    public boolean isOwner(final UserLobbyMember lobbyMember) {
+        return this.owner.equals(lobbyMember);
+    }
+
     public boolean containsMember(final LobbyMember member) {
         return this.members.contains(member);
     }
@@ -88,5 +104,9 @@ public class Lobby implements IWebSocketData, IEventContext<Lobby, LobbyEvent> {
         member.setLobby(null);
         this.members.remove(member);
         this.chat.removeMember(member);
+    }
+
+    public Set<LobbyMember> getMembers() {
+        return Collections.unmodifiableSet(this.members);
     }
 }

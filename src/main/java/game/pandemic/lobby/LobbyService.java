@@ -7,8 +7,8 @@ import game.pandemic.lobby.events.LeaveLobbyEvent;
 import game.pandemic.lobby.member.LobbyMember;
 import game.pandemic.lobby.member.LobbyMemberRepository;
 import game.pandemic.lobby.member.UserLobbyMember;
+import game.pandemic.lobby.member.messengers.ILobbyMemberMessenger;
 import game.pandemic.lobby.websocket.LobbyAndAccessTokenHolder;
-import game.pandemic.messaging.messengers.IMulticastMessenger;
 import game.pandemic.messaging.messengers.IUnicastMessenger;
 import game.pandemic.user.User;
 import game.pandemic.websocket.auth.AccessTokenService;
@@ -29,11 +29,11 @@ public class LobbyService {
     private final LobbyRepository lobbyRepository;
     private final LobbyMemberRepository lobbyMemberRepository;
     private final IUnicastMessenger<User> userMessenger;
-    private final IMulticastMessenger<LobbyMember> lobbyMemberMessenger;
+    private final ILobbyMemberMessenger<LobbyMember> lobbyMemberMessenger;
 
     @Transactional
     public void sendLobbiesToUser(final User user) {
-        this.userMessenger.unicast(user, this.lobbyRepository.findAll(), JacksonView.Read.class);
+        this.userMessenger.unicast(user, this.lobbyRepository.findAllByIsClosedFalse(), JacksonView.Read.class);
     }
 
     @Transactional
@@ -48,7 +48,7 @@ public class LobbyService {
     private void findLobbyAndExecute(final String lobbyId, final Consumer<Lobby> callback) {
         if (NumberUtils.isCreatable(lobbyId)) {
             final Long id = Long.parseLong(lobbyId);
-            this.lobbyRepository.findById(id).ifPresent(callback);
+            this.lobbyRepository.findByIdAndIsClosedFalse(id).ifPresent(callback);
         }
     }
 
@@ -59,11 +59,15 @@ public class LobbyService {
     }
 
     private void sendLobbyToMembers(final Lobby lobby) {
-        this.lobbyMemberMessenger.multicast(
-                lobby.getMembers(),
-                lobby,
-                JacksonView.Read.class
-        );
+        if (lobby.isClosed()) {
+            this.lobbyMemberMessenger.closeConnection(lobby.getMembers());
+        } else {
+            this.lobbyMemberMessenger.multicast(
+                    lobby.getMembers(),
+                    lobby,
+                    JacksonView.Read.class
+            );
+        }
     }
 
     @Transactional
