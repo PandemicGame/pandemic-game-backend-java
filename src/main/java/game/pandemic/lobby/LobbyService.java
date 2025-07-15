@@ -15,6 +15,7 @@ import game.pandemic.lobby.websocket.LobbyAndAccessTokenHolder;
 import game.pandemic.messaging.messengers.IGeneralPurposeMessenger;
 import game.pandemic.user.User;
 import game.pandemic.websocket.auth.AccessTokenService;
+import jakarta.annotation.PreDestroy;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -33,6 +34,11 @@ public class LobbyService {
     private final LobbyMemberRepository lobbyMemberRepository;
     private final IGeneralPurposeMessenger<User> userMessenger;
     private final ILobbyMemberMessenger<LobbyMember> lobbyMemberMessenger;
+
+    @PreDestroy
+    private void onShutdown() {
+        this.lobbyRepository.closeAll();
+    }
 
     @Transactional
     public void sendLobbiesToUser(final User user) {
