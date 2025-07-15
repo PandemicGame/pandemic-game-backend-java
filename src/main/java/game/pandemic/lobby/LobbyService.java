@@ -9,7 +9,7 @@ import game.pandemic.lobby.member.LobbyMemberRepository;
 import game.pandemic.lobby.member.UserLobbyMember;
 import game.pandemic.lobby.member.messengers.ILobbyMemberMessenger;
 import game.pandemic.lobby.websocket.LobbyAndAccessTokenHolder;
-import game.pandemic.messaging.messengers.IUnicastMessenger;
+import game.pandemic.messaging.messengers.IGeneralPurposeMessenger;
 import game.pandemic.user.User;
 import game.pandemic.websocket.auth.AccessTokenService;
 import jakarta.transaction.Transactional;
@@ -28,7 +28,7 @@ public class LobbyService {
     private final AccessTokenService<UserLobbyMember> accessTokenService;
     private final LobbyRepository lobbyRepository;
     private final LobbyMemberRepository lobbyMemberRepository;
-    private final IUnicastMessenger<User> userMessenger;
+    private final IGeneralPurposeMessenger<User> userMessenger;
     private final ILobbyMemberMessenger<LobbyMember> lobbyMemberMessenger;
 
     @Transactional
@@ -61,6 +61,7 @@ public class LobbyService {
     private void sendLobbyToMembers(final Lobby lobby) {
         if (lobby.isClosed()) {
             this.lobbyMemberMessenger.closeConnection(lobby.getMembers());
+            this.userMessenger.broadcast(this.lobbyRepository.findAllByIsClosedFalse(), JacksonView.Read.class);
         } else {
             this.lobbyMemberMessenger.multicast(
                     lobby.getMembers(),
