@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -25,5 +26,18 @@ public class BoardType {
         this.name = name;
         this.startingLocation = startingLocation;
         this.slots = slots;
+    }
+
+    public Optional<BoardSlot> findBoardSlotForLocation(final Location location) {
+        return this.slots.stream()
+                .filter(slot -> slot.hasLocation(location))
+                .findFirst();
+    }
+
+    public List<BoardSlot> getConnectionsForBoardSlot(final BoardSlot boardSlot) {
+        final List<Location> connectedLocations = boardSlot.getConnectedLocations();
+        return this.slots.stream()
+                .filter(slot -> connectedLocations.contains(slot.getLocation()))
+                .toList();
     }
 }

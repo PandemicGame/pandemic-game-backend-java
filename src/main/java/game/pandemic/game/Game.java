@@ -1,6 +1,8 @@
 package game.pandemic.game;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import game.pandemic.game.board.Board;
+import game.pandemic.game.board.type.BoardType;
 import game.pandemic.game.player.Player;
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.lobby.Lobby;
@@ -27,11 +29,15 @@ public class Game implements IWebSocketData {
     @OrderColumn(name = "player_index")
     @JsonView(JacksonView.Read.class)
     private List<Player> playersInTurnOrder;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JsonView(JacksonView.Read.class)
+    private Board board;
 
-    public Game(final Lobby lobby) {
+    public Game(final Lobby lobby, final BoardType boardType) {
         this.lobby = lobby;
         this.lobby.setGame(this);
         this.playersInTurnOrder = createPlayersInTurnOrderList();
+        this.board = new Board(boardType);
     }
 
     private List<Player> createPlayersInTurnOrderList() {

@@ -4,6 +4,7 @@ import game.pandemic.game.board.location.Location;
 import game.pandemic.game.plague.Plague;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,9 +13,11 @@ import java.util.List;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class BoardSlot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
     private int xCoordinate;
     private int yCoordinate;
@@ -31,5 +34,13 @@ public class BoardSlot {
         this.plague = plague;
         this.location = location;
         this.connectedLocations = connectedLocations;
+    }
+
+    public boolean hasLocation(final Location location) {
+        return this.location.equals(location);
+    }
+
+    public String getName() {
+        return this.location.getName();
     }
 }
