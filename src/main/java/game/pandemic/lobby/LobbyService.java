@@ -59,16 +59,11 @@ public class LobbyService {
     }
 
     private void sendLobbyToMembers(final Lobby lobby) {
-        if (lobby.isClosed()) {
-            this.lobbyMemberMessenger.closeConnection(lobby.getMembers());
-            this.userMessenger.broadcast(this.lobbyRepository.findAllByIsClosedFalse(), JacksonView.Read.class);
-        } else {
-            this.lobbyMemberMessenger.multicast(
-                    lobby.getMembers(),
-                    lobby,
-                    JacksonView.Read.class
-            );
-        }
+        this.lobbyMemberMessenger.multicast(
+                lobby.getMembers(),
+                lobby,
+                JacksonView.Read.class
+        );
     }
 
     @Transactional
@@ -115,6 +110,8 @@ public class LobbyService {
     }
 
     private void leaveLobby(final Lobby lobby, final LobbyMember lobbyMember) {
+        final boolean isLobbyClosedBeforeLeave = lobby.isClosed();
+
         lobby.processEvent(new LeaveLobbyEvent(lobbyMember));
 
         this.lobbyMemberRepository.detachLobby(lobbyMember.getId());
@@ -123,6 +120,19 @@ public class LobbyService {
 
         log.info("LobbyMember \"" + lobbyMember.getName() + "\" left lobby \"" + saved.getName() + "\".");
 
-        sendLobbyToMembers(saved);
+        if (!isLobbyClosedBeforeLeave && lobby.isClosed()) {
+            handleLobbyClosure(lobby);
+        }
+
+        if (!lobby.isClosed()) {
+            sendLobbyToMembers(saved);
+        }
+    }
+
+    private void handleLobbyClosure(final Lobby lobby) {
+        if (lobby.isClosed()) {
+            this.lobbyMemberMessenger.closeConnection(lobby.getMembers());
+            this.userMessenger.broadcast(this.lobbyRepository.findAllByIsClosedFalse(), JacksonView.Read.class);
+        }
     }
 }
