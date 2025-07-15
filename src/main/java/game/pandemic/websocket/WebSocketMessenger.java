@@ -44,7 +44,7 @@ public class WebSocketMessenger extends MessengerWithSerialization<WebSocketSess
         return closeConnection(target, CloseStatus.NORMAL.withReason(message));
     }
 
-    protected boolean closeConnection(final WebSocketSession target, final CloseStatus closeStatus) {
+    public boolean closeConnection(final WebSocketSession target, final CloseStatus closeStatus) {
         try {
             target.close(closeStatus);
             return true;
@@ -64,7 +64,7 @@ public class WebSocketMessenger extends MessengerWithSerialization<WebSocketSess
         return closeConnection(targets, CloseStatus.NORMAL.withReason(message));
     }
 
-    protected Map<WebSocketSession, Boolean> closeConnection(final Set<WebSocketSession> targets, final CloseStatus closeStatus) {
+    public Map<WebSocketSession, Boolean> closeConnection(final Set<WebSocketSession> targets, final CloseStatus closeStatus) {
         return targets.stream()
                 .map(target -> new AbstractMap.SimpleEntry<>(target, closeConnection(target, closeStatus)))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));

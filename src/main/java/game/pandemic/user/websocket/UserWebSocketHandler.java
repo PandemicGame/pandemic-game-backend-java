@@ -2,9 +2,9 @@ package game.pandemic.user.websocket;
 
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.jackson.ObjectMapper;
-import game.pandemic.messaging.messengers.IUnicastAndMulticastMessenger;
 import game.pandemic.user.User;
 import game.pandemic.validation.ValidationService;
+import game.pandemic.websocket.WebSocketMessenger;
 import game.pandemic.websocket.WebSocketSessionRegistry;
 import game.pandemic.websocket.auth.AccessTokenService;
 import game.pandemic.websocket.endpoint.IWebSocketController;
@@ -19,7 +19,7 @@ import java.util.List;
 @Component
 public class UserWebSocketHandler extends WebSocketHandler<User> {
     public UserWebSocketHandler(final WebSocketSessionRegistry<User> webSocketSessionRegistry,
-                                final IUnicastAndMulticastMessenger<WebSocketSession> webSocketSessionMessenger,
+                                final WebSocketMessenger webSocketSessionMessenger,
                                 final AccessTokenService<User> accessTokenService,
                                 final List<IWebSocketController<User>> webSocketControllers,
                                 final ObjectMapper objectMapper,
@@ -48,7 +48,7 @@ public class UserWebSocketHandler extends WebSocketHandler<User> {
     @Override
     public void afterConnectionClosed(@NonNull final WebSocketSession session, @NonNull final CloseStatus status) {
         super.afterConnectionClosed(session, status);
-        if (!CloseStatus.GOING_AWAY.equalsCode(status)) {
+        if (!SHUTDOWN_CLOSE_STATUS.equalsCode(status)) {
             sendMessageWithAllUsersToAllUsers();
         }
     }
