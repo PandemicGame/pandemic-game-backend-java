@@ -4,6 +4,7 @@ import game.pandemic.jackson.JacksonView;
 import game.pandemic.lobby.events.CreateLobbyEvent;
 import game.pandemic.lobby.events.JoinLobbyEvent;
 import game.pandemic.lobby.events.LeaveLobbyEvent;
+import game.pandemic.lobby.events.StartGameLobbyEvent;
 import game.pandemic.lobby.member.LobbyMember;
 import game.pandemic.lobby.member.LobbyMemberRepository;
 import game.pandemic.lobby.member.UserLobbyMember;
@@ -134,5 +135,34 @@ public class LobbyService {
             this.lobbyMemberMessenger.closeConnection(lobby.getMembers());
             this.userMessenger.broadcast(this.lobbyRepository.findAllByIsClosedFalse(), JacksonView.Read.class);
         }
+    }
+
+    @Transactional
+    public void startGame(final UserLobbyMember userLobbyMember) {
+        this.lobbyRepository.findLobbyByMembersContaining(userLobbyMember).ifPresent(lobby -> startGame(lobby, userLobbyMember));
+    }
+
+    private void startGame(final Lobby lobby, final UserLobbyMember userLobbyMember) {
+        if (!lobby.isOwner(userLobbyMember)) {
+            log.warn("Non-owner \"" + userLobbyMember.getName() + "\" cannot start a game in lobby \"" + lobby.getName() + "\".");
+            return;
+        }
+
+        if (lobby.getMembers().size() < 2) {
+            log.warn("Cannot start game in lobby \"" + lobby.getName() + "\" as there are not enough members.");
+            return;
+        }
+
+        lobby.processEvent(new StartGameLobbyEvent());
+
+        final Lobby saved = this.lobbyRepository.save(lobby);
+
+        log.info("A game was started in lobby \"" + saved.getName() + "\".");
+
+        this.lobbyMemberMessenger.multicast(
+                saved.getMembers(),
+                saved.getGame(),
+                JacksonView.Read.class
+        );
     }
 }
