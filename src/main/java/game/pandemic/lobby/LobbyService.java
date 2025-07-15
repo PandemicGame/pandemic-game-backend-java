@@ -1,5 +1,7 @@
 package game.pandemic.lobby;
 
+import game.pandemic.game.Game;
+import game.pandemic.game.GameAndPlayerHolder;
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.lobby.events.CreateLobbyEvent;
 import game.pandemic.lobby.events.JoinLobbyEvent;
@@ -163,10 +165,17 @@ public class LobbyService {
 
         log.info("A game was started in lobby \"" + saved.getName() + "\".");
 
-        this.lobbyMemberMessenger.multicast(
-                saved.getMembers(),
-                saved.getGame(),
+        saved.getMembers().forEach(member -> sendGameToMember(member, saved.getGame()));
+    }
+
+    private void sendGameToMember(final LobbyMember lobbyMember, final Game game) {
+        game.findPlayerByLobbyMember(lobbyMember).ifPresent(player -> this.lobbyMemberMessenger.unicast(
+                lobbyMember,
+                new GameAndPlayerHolder(
+                        game,
+                        player
+                ),
                 JacksonView.Read.class
-        );
+        ));
     }
 }
