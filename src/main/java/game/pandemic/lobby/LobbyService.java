@@ -2,6 +2,7 @@ package game.pandemic.lobby;
 
 import game.pandemic.game.Game;
 import game.pandemic.game.GameAndPlayerHolder;
+import game.pandemic.game.board.type.BoardTypeRepository;
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.lobby.events.CreateLobbyEvent;
 import game.pandemic.lobby.events.JoinLobbyEvent;
@@ -34,6 +35,7 @@ public class LobbyService {
     private final LobbyMemberRepository lobbyMemberRepository;
     private final IGeneralPurposeMessenger<User> userMessenger;
     private final ILobbyMemberMessenger<LobbyMember> lobbyMemberMessenger;
+    private final BoardTypeRepository boardTypeRepository;
 
     @PreDestroy
     private void onShutdown() {
@@ -165,7 +167,7 @@ public class LobbyService {
             return;
         }
 
-        lobby.processEvent(new StartGameLobbyEvent());
+        lobby.processEvent(new StartGameLobbyEvent(this.boardTypeRepository.findAll().get(0)));
 
         final Lobby saved = this.lobbyRepository.save(lobby);
 
