@@ -102,7 +102,11 @@ public class LobbyService {
 
     private LobbyAndAccessTokenHolder createLobbyAndAccessTokenHolder(final UserLobbyMember userLobbyMember,
                                                                       final Lobby lobby) {
-        return new LobbyAndAccessTokenHolder(lobby, this.accessTokenService.createAccessTokenForObject(userLobbyMember));
+        return new LobbyAndAccessTokenHolder(
+                lobby,
+                this.accessTokenService.createAccessTokenForObject(userLobbyMember),
+                userLobbyMember
+        );
     }
 
     @Transactional
