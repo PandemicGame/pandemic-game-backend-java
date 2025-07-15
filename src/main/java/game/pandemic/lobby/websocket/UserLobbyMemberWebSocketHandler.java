@@ -45,7 +45,9 @@ public class UserLobbyMemberWebSocketHandler extends WebSocketHandler<UserLobbyM
 
     @Override
     public void afterConnectionClosed(@NonNull final WebSocketSession session, @NonNull final CloseStatus status) {
-        this.webSocketSessionRegistry.findAuthenticationObjectForSession(session).ifPresent(this.lobbyService::leaveLobby);
+        if (!CloseStatus.GOING_AWAY.equalsCode(status)) {
+            this.webSocketSessionRegistry.findAuthenticationObjectForSession(session).ifPresent(this.lobbyService::leaveLobby);
+        }
         super.afterConnectionClosed(session, status);
     }
 }
