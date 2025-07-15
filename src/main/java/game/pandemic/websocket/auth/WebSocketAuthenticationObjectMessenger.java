@@ -1,7 +1,7 @@
 package game.pandemic.websocket.auth;
 
 import game.pandemic.jackson.ObjectMapper;
-import game.pandemic.messaging.messengers.IMulticastMessenger;
+import game.pandemic.messaging.messengers.persistent.IMulticastPersistentConnectionMessenger;
 import game.pandemic.messaging.messengers.serialization.IGeneralPurposeMessengerWithSerialization;
 import game.pandemic.messaging.messengers.serialization.MessengerWithSerialization;
 import game.pandemic.websocket.WebSocketSessionRegistry;
@@ -14,10 +14,10 @@ import java.util.stream.Collectors;
 
 public abstract class WebSocketAuthenticationObjectMessenger<A extends IWebSocketAuthenticationObject> extends MessengerWithSerialization<A> implements IGeneralPurposeMessengerWithSerialization<A> {
     protected final WebSocketSessionRegistry<A> webSocketSessionRegistry;
-    protected final IMulticastMessenger<WebSocketSession> webSocketMessenger;
+    protected final IMulticastPersistentConnectionMessenger<WebSocketSession> webSocketMessenger;
 
     protected WebSocketAuthenticationObjectMessenger(final WebSocketSessionRegistry<A> webSocketSessionRegistry,
-                                                     final IMulticastMessenger<WebSocketSession> webSocketMessenger,
+                                                     final IMulticastPersistentConnectionMessenger<WebSocketSession> webSocketMessenger,
                                                      final ObjectMapper objectMapper) {
         super(objectMapper);
         this.webSocketSessionRegistry = webSocketSessionRegistry;
