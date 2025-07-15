@@ -3,8 +3,8 @@ package game.pandemic.lobby.websocket;
 import game.pandemic.jackson.ObjectMapper;
 import game.pandemic.lobby.LobbyService;
 import game.pandemic.lobby.member.UserLobbyMember;
-import game.pandemic.messaging.messengers.IUnicastAndMulticastMessenger;
 import game.pandemic.validation.ValidationService;
+import game.pandemic.websocket.WebSocketMessenger;
 import game.pandemic.websocket.WebSocketSessionRegistry;
 import game.pandemic.websocket.auth.AccessTokenService;
 import game.pandemic.websocket.endpoint.IWebSocketController;
@@ -21,7 +21,7 @@ public class UserLobbyMemberWebSocketHandler extends WebSocketHandler<UserLobbyM
     private final LobbyService lobbyService;
 
     public UserLobbyMemberWebSocketHandler(final WebSocketSessionRegistry<UserLobbyMember> webSocketSessionRegistry,
-                                           final IUnicastAndMulticastMessenger<WebSocketSession> webSocketSessionMessenger,
+                                           final WebSocketMessenger webSocketSessionMessenger,
                                            final AccessTokenService<UserLobbyMember> accessTokenService,
                                            final List<IWebSocketController<UserLobbyMember>> iWebSocketControllers,
                                            final ObjectMapper objectMapper,
@@ -45,7 +45,7 @@ public class UserLobbyMemberWebSocketHandler extends WebSocketHandler<UserLobbyM
 
     @Override
     public void afterConnectionClosed(@NonNull final WebSocketSession session, @NonNull final CloseStatus status) {
-        if (!CloseStatus.GOING_AWAY.equalsCode(status)) {
+        if (!SHUTDOWN_CLOSE_STATUS.equalsCode(status)) {
             this.webSocketSessionRegistry.findAuthenticationObjectForSession(session).ifPresent(this.lobbyService::leaveLobby);
         }
         super.afterConnectionClosed(session, status);

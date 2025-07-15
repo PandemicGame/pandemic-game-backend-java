@@ -1,12 +1,13 @@
 package game.pandemic.websocket.endpoint;
 
 import game.pandemic.jackson.ObjectMapper;
-import game.pandemic.messaging.messengers.IUnicastAndMulticastMessenger;
 import game.pandemic.validation.ValidationService;
+import game.pandemic.websocket.WebSocketMessenger;
 import game.pandemic.websocket.WebSocketSessionRegistry;
 import game.pandemic.websocket.auth.AccessTokenService;
 import game.pandemic.websocket.auth.IWebSocketAuthenticationObject;
 import game.pandemic.websocket.message.WebSocketMessage;
+import jakarta.annotation.PreDestroy;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -22,9 +23,12 @@ import java.util.List;
 @Log4j2
 public abstract class WebSocketHandler<A extends IWebSocketAuthenticationObject> extends TextWebSocketHandler implements IWebSocketEndpointDelegator<A, IWebSocketController<A>> {
     public static final String AUTH_SUCCESS_RESPONSE = "AUTH_SUCCESS";
+    public static final int SHUTDOWN_STATUS_CODE = 4000;
+    public static final String SHUTDOWN_MESSAGE = "Server shutting down";
+    public static final CloseStatus SHUTDOWN_CLOSE_STATUS = new CloseStatus(SHUTDOWN_STATUS_CODE, SHUTDOWN_MESSAGE);
 
     protected final WebSocketSessionRegistry<A> webSocketSessionRegistry;
-    protected final IUnicastAndMulticastMessenger<WebSocketSession> webSocketSessionMessenger;
+    protected final WebSocketMessenger webSocketSessionMessenger;
     protected final AccessTokenService<A> accessTokenService;
     protected final List<IWebSocketController<A>> webSocketControllers;
     protected final ObjectMapper objectMapper;
@@ -103,5 +107,10 @@ public abstract class WebSocketHandler<A extends IWebSocketAuthenticationObject>
     public void afterConnectionClosed(@NonNull final WebSocketSession session, @NonNull final CloseStatus status) {
         log.info("WebSocket connection closed at endpoint \"" + getEndpointMapping() + "\": " + session.getId());
         this.webSocketSessionRegistry.removeSession(session);
+    }
+
+    @PreDestroy
+    protected void onShutdown() {
+        this.webSocketSessionMessenger.closeConnection(this.webSocketSessionRegistry.findAllSessions(), SHUTDOWN_CLOSE_STATUS);
     }
 }
