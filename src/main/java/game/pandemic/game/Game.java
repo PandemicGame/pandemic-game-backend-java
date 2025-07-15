@@ -36,13 +36,13 @@ public class Game implements IWebSocketData {
     public Game(final Lobby lobby, final BoardType boardType) {
         this.lobby = lobby;
         this.lobby.setGame(this);
-        this.playersInTurnOrder = createPlayersInTurnOrderList();
         this.board = new Board(boardType);
+        this.playersInTurnOrder = createPlayersInTurnOrderList();
     }
 
     private List<Player> createPlayersInTurnOrderList() {
         return this.lobby.getMembers().stream()
-                .map(Player::new)
+                .map(member -> new Player(member, this.board.getStartingField()))
                 .toList();
     }
 
