@@ -48,7 +48,9 @@ public class UserWebSocketHandler extends WebSocketHandler<User> {
     @Override
     public void afterConnectionClosed(@NonNull final WebSocketSession session, @NonNull final CloseStatus status) {
         super.afterConnectionClosed(session, status);
-        sendMessageWithAllUsersToAllUsers();
+        if (!CloseStatus.GOING_AWAY.equalsCode(status)) {
+            sendMessageWithAllUsersToAllUsers();
+        }
     }
 
     protected void sendMessageWithAllUsersToAllUsers() {
