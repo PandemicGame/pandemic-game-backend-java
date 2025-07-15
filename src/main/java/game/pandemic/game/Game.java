@@ -3,6 +3,7 @@ package game.pandemic.game;
 import com.fasterxml.jackson.annotation.JsonView;
 import game.pandemic.game.board.Board;
 import game.pandemic.game.board.type.BoardType;
+import game.pandemic.game.plague.Plague;
 import game.pandemic.game.player.Player;
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.lobby.Lobby;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -50,5 +52,10 @@ public class Game implements IWebSocketData {
         return this.playersInTurnOrder.stream()
                 .filter(player -> player.containsLobbyMember(lobbyMember))
                 .findFirst();
+    }
+
+    @JsonView(JacksonView.Read.class)
+    public Set<Plague> getPlagues() {
+        return this.board.getPlagues();
     }
 }

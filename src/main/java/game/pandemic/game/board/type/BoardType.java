@@ -1,6 +1,7 @@
 package game.pandemic.game.board.type;
 
 import game.pandemic.game.board.location.Location;
+import game.pandemic.game.plague.Plague;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -8,6 +9,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -39,5 +42,11 @@ public class BoardType {
         return this.slots.stream()
                 .filter(slot -> connectedLocations.contains(slot.getLocation()))
                 .toList();
+    }
+
+    public Set<Plague> getPlagues() {
+        return this.slots.stream()
+                .map(BoardSlot::getPlague)
+                .collect(Collectors.toSet());
     }
 }
