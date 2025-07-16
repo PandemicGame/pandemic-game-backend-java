@@ -39,12 +39,12 @@ public class Field implements IWebSocketData {
     }
 
     @JsonView(JacksonView.Read.class)
-    public int getXCoordinate() {
+    public double getXCoordinate() {
         return this.slot.getXCoordinate();
     }
 
     @JsonView(JacksonView.Read.class)
-    public int getYCoordinate() {
+    public double getYCoordinate() {
         return this.slot.getYCoordinate();
     }
 

@@ -19,8 +19,8 @@ public class BoardSlot {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
-    private int xCoordinate;
-    private int yCoordinate;
+    private double xCoordinate;
+    private double yCoordinate;
     @ManyToOne
     private Plague plague;
     @ManyToOne
@@ -28,7 +28,7 @@ public class BoardSlot {
     @ManyToMany
     private List<Location> connectedLocations;
 
-    public BoardSlot(final int xCoordinate, final int yCoordinate, final Plague plague, final Location location, final List<Location> connectedLocations) {
+    public BoardSlot(final double xCoordinate, final double yCoordinate, final Plague plague, final Location location, final List<Location> connectedLocations) {
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
         this.plague = plague;
