@@ -21,6 +21,7 @@ import static game.pandemic.game.board.location.LocationCode.*;
 @RequiredArgsConstructor
 public class WorldMapBoardTypeFactory {
     public static final String WORLD_MAP_NAME = "World Map";
+    public static final double POSITION_ADJUSTMENT = 5.0;
 
     private final LocationRepository locationRepository;
     private final PlagueRepository plagueRepository;
@@ -45,16 +46,16 @@ public class WorldMapBoardTypeFactory {
     private List<BoardSlot> createBlue() throws NoSuchElementException {
         final Plague blue = findPlagueOrThrow(PlagueCode.BLUE);
         return List.of(
-                new BoardSlot(-122.25, 37.47, blue, findLocationOrThrow(SAN_FRANCISCO), findLocationsOrThrow(CHICAGO, LOS_ANGELES, MANILA, TOKYO)),
+                new BoardSlot(-122.25, 37.47 + POSITION_ADJUSTMENT, blue, findLocationOrThrow(SAN_FRANCISCO), findLocationsOrThrow(CHICAGO, LOS_ANGELES, MANILA, TOKYO)),
                 new BoardSlot(-87.38, 41.53, blue, findLocationOrThrow(CHICAGO), findLocationsOrThrow(SAN_FRANCISCO, LOS_ANGELES, MEXICO_CITY, ATLANTA, MONTREAL)),
                 new BoardSlot(-73.34, 45.30, blue, findLocationOrThrow(MONTREAL), findLocationsOrThrow(CHICAGO, WASHINGTON, NEW_YORK_CITY)),
-                new BoardSlot(-73.56, 40.40, blue, findLocationOrThrow(NEW_YORK_CITY), findLocationsOrThrow(MONTREAL, WASHINGTON, LONDON, MADRID)),
+                new BoardSlot(-73.56 + POSITION_ADJUSTMENT, 40.40, blue, findLocationOrThrow(NEW_YORK_CITY), findLocationsOrThrow(MONTREAL, WASHINGTON, LONDON, MADRID)),
                 new BoardSlot(-84.23, 33.45, blue, findLocationOrThrow(ATLANTA), findLocationsOrThrow(CHICAGO, WASHINGTON, MIAMI)),
                 new BoardSlot(-77.02, 38.54, blue, findLocationOrThrow(WASHINGTON), findLocationsOrThrow(ATLANTA, MIAMI, NEW_YORK_CITY, MONTREAL)),
                 new BoardSlot(-3.43, 40.23, blue, findLocationOrThrow(MADRID), findLocationsOrThrow(NEW_YORK_CITY, SAO_PAULO, ALGIERS, PARIS, LONDON)),
-                new BoardSlot(-0.08, 51.30, blue, findLocationOrThrow(LONDON), findLocationsOrThrow(NEW_YORK_CITY, MADRID, PARIS, ESSEN)),
+                new BoardSlot(-0.08, 51.30 + POSITION_ADJUSTMENT / 2, blue, findLocationOrThrow(LONDON), findLocationsOrThrow(NEW_YORK_CITY, MADRID, PARIS, ESSEN)),
                 new BoardSlot(2.21, 48.51, blue, findLocationOrThrow(PARIS), findLocationsOrThrow(LONDON, MADRID, ALGIERS, MILAN, ESSEN)),
-                new BoardSlot(6.47, 51.14, blue, findLocationOrThrow(ESSEN), findLocationsOrThrow(LONDON, PARIS, MILAN, SAINT_PETERSBURG)),
+                new BoardSlot(6.47 + POSITION_ADJUSTMENT, 51.14, blue, findLocationOrThrow(ESSEN), findLocationsOrThrow(LONDON, PARIS, MILAN, SAINT_PETERSBURG)),
                 new BoardSlot(9.11, 45.28, blue, findLocationOrThrow(MILAN), findLocationsOrThrow(ESSEN, PARIS, ISTANBUL)),
                 new BoardSlot(30.18, 59.57, blue, findLocationOrThrow(SAINT_PETERSBURG), findLocationsOrThrow(ESSEN, ISTANBUL, MOSCOW))
         );
@@ -101,12 +102,12 @@ public class WorldMapBoardTypeFactory {
         return List.of(
                 new BoardSlot(106.38, -6.12, red, findLocationOrThrow(JAKARTA), findLocationsOrThrow(CHENNAI, BANGKOK, HO_CHI_MINH_CITY, SYDNEY)),
                 new BoardSlot(151.13, -33.52, red, findLocationOrThrow(SYDNEY), findLocationsOrThrow(JAKARTA, MANILA, LOS_ANGELES)),
-                new BoardSlot(106.41, 10.46, red, findLocationOrThrow(HO_CHI_MINH_CITY), findLocationsOrThrow(JAKARTA, BANGKOK, HONG_KONG, MANILA)),
+                new BoardSlot(106.41 + POSITION_ADJUSTMENT, 10.46 - POSITION_ADJUSTMENT, red, findLocationOrThrow(HO_CHI_MINH_CITY), findLocationsOrThrow(JAKARTA, BANGKOK, HONG_KONG, MANILA)),
                 new BoardSlot(100.28, 13.45, red, findLocationOrThrow(BANGKOK), findLocationsOrThrow(KOLKATA, CHENNAI, JAKARTA, HO_CHI_MINH_CITY, HONG_KONG)),
                 new BoardSlot(114.10, 22.17, red, findLocationOrThrow(HONG_KONG), findLocationsOrThrow(KOLKATA, BANGKOK, HO_CHI_MINH_CITY, MANILA, TAIPEI, SHANGHAI)),
                 new BoardSlot(120.58, 14.35, red, findLocationOrThrow(MANILA), findLocationsOrThrow(SYDNEY, SAN_FRANCISCO, TAIPEI, HONG_KONG, HO_CHI_MINH_CITY)),
                 new BoardSlot(121.38, 25.02, red, findLocationOrThrow(TAIPEI), findLocationsOrThrow(OSAKA, SHANGHAI, HONG_KONG, MANILA)),
-                new BoardSlot(135.30, 34.42, red, findLocationOrThrow(OSAKA), findLocationsOrThrow(TAIPEI, TOKYO)),
+                new BoardSlot(135.30, 34.42 - POSITION_ADJUSTMENT, red, findLocationOrThrow(OSAKA), findLocationsOrThrow(TAIPEI, TOKYO)),
                 new BoardSlot(139.42, 35.41, red, findLocationOrThrow(TOKYO), findLocationsOrThrow(OSAKA, SAN_FRANCISCO, SEOUL, SHANGHAI)),
                 new BoardSlot(126.59, 37.34, red, findLocationOrThrow(SEOUL), findLocationsOrThrow(TOKYO, BEIJING, SHANGHAI)),
                 new BoardSlot(116.23, 39.55, red, findLocationOrThrow(BEIJING), findLocationsOrThrow(SEOUL, SHANGHAI)),
