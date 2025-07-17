@@ -28,7 +28,7 @@ public class WebSocketMessenger extends MessengerWithSerialization<WebSocketSess
         try {
             target.sendMessage(new TextMessage(message));
             return true;
-        } catch (final IOException e) {
+        } catch (final IOException | IllegalStateException e) {
             log.warn("An Exception occurred during sending of message to session: " + target.getId());
             return false;
         }
