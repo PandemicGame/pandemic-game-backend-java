@@ -1,6 +1,7 @@
 package game.pandemic.websocket.endpoint;
 
 import game.pandemic.websocket.auth.IWebSocketAuthenticationObject;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -11,13 +12,13 @@ public non-sealed interface IWebSocketEndpointDelegator<A extends IWebSocketAuth
         STARTS_WITH_MATCHING,
     }
 
-    default void delegateToEndpoints(final String path, final A authenticationObject, final String message) {
+    default void delegateToEndpoints(final String path, final WebSocketSession session, final A authenticationObject, final String message) {
         final List<T> allEndPoints = getAllEndpoints();
         final Map<T, String> matchingEndPointsWithRestPaths = findEndpointsWithMatchingPath(allEndPoints, path);
         if (matchingEndPointsWithRestPaths.isEmpty()) {
             noValidEndpointsForPathHandler(path);
         } else {
-            delegateToEndpoints(matchingEndPointsWithRestPaths, authenticationObject, message);
+            delegateToEndpoints(matchingEndPointsWithRestPaths, session, authenticationObject, message);
         }
     }
 
@@ -76,9 +77,9 @@ public non-sealed interface IWebSocketEndpointDelegator<A extends IWebSocketAuth
 
     void noValidEndpointsForPathHandler(final String path);
 
-    default void delegateToEndpoints(final Map<T, String> endpointsWithPaths, final A authenticationObject, final String message) {
+    default void delegateToEndpoints(final Map<T, String> endpointsWithPaths, final WebSocketSession session, final A authenticationObject, final String message) {
         for (final Map.Entry<T, String> endpointWithPath : endpointsWithPaths.entrySet()) {
-            delegateToEndpoint(endpointWithPath.getKey(), endpointWithPath.getValue(), authenticationObject, message);
+            delegateToEndpoint(endpointWithPath.getKey(), endpointWithPath.getValue(), session, authenticationObject, message);
             if (!doesAllowMultipleDelegationsPerPath()) {
                 break;
             }
@@ -86,11 +87,11 @@ public non-sealed interface IWebSocketEndpointDelegator<A extends IWebSocketAuth
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    default void delegateToEndpoint(final T endpoint, final String path, final A authenticationObject, final String message) {
+    default void delegateToEndpoint(final T endpoint, final String path, final WebSocketSession session, final A authenticationObject, final String message) {
         if (endpoint instanceof IWebSocketEndpointConsumer consumer) {
-            consumer.consume(authenticationObject, message);
+            consumer.consume(session, authenticationObject, message);
         } else if (endpoint instanceof IWebSocketEndpointDelegator delegator) {
-            delegator.delegateToEndpoints(path, authenticationObject, message);
+            delegator.delegateToEndpoints(path, session, authenticationObject, message);
         }
     }
 

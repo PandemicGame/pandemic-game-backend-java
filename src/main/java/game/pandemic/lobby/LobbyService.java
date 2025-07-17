@@ -24,6 +24,8 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -45,24 +47,28 @@ public class LobbyService {
     }
 
     @Transactional
-    public void sendLobbiesToUser(final User user) {
-        this.userMessenger.unicast(user, this.lobbyRepository.findAllByIsClosedFalse(), JacksonView.Read.class);
+    public List<Lobby> getAllLobbies() {
+        return this.lobbyRepository.findAllByIsClosedFalse();
     }
 
     @Transactional
-    public void joinLobby(final User user, final String lobbyId) {
-        findLobbyAndExecute(lobbyId, lobby -> addUserToLobbyAndProceed(
+    public Optional<LobbyAndAccessTokenHolder> joinLobby(final User user, final String lobbyId) {
+        return findLobbyAndExecute(lobbyId, lobby -> addUserToLobbyAndProceed(
                 user,
                 m -> addMemberToLobby(lobby, m),
                 this::sendLobbyToMembers
         ));
     }
 
-    private void findLobbyAndExecute(final String lobbyId, final Consumer<Lobby> callback) {
+    private <R> Optional<R> findLobbyAndExecute(final String lobbyId, final Function<Lobby, R> callback) {
         if (NumberUtils.isCreatable(lobbyId)) {
             final Long id = Long.parseLong(lobbyId);
-            this.lobbyRepository.findByIdAndIsClosedFalse(id).ifPresent(callback);
+            final Optional<Lobby> lobbyOptional = this.lobbyRepository.findByIdAndIsClosedFalse(id);
+            if (lobbyOptional.isPresent()) {
+                return Optional.of(callback.apply(lobbyOptional.get()));
+            }
         }
+        return Optional.empty();
     }
 
     private Lobby addMemberToLobby(final Lobby lobby, final LobbyMember member) {
@@ -80,36 +86,27 @@ public class LobbyService {
     }
 
     @Transactional
-    public void createLobby(final User user, final String name) {
-        addUserToLobbyAndProceed(
+    public LobbyAndAccessTokenHolder createLobby(final User user, final String name) {
+        return addUserToLobbyAndProceed(
                 user,
                 m -> new CreateLobbyEvent(name, m).createLobby(),
                 l -> log.info("Created lobby with name: " + name)
         );
     }
 
-    private void addUserToLobbyAndProceed(final User user,
+    private LobbyAndAccessTokenHolder addUserToLobbyAndProceed(final User user,
                                           final Function<UserLobbyMember, Lobby> memberToLobbyFunction,
                                           final Consumer<Lobby> callback) {
         final UserLobbyMember userLobbyMember = createUserLobbyMember(user);
         final Lobby lobby = memberToLobbyFunction.apply(userLobbyMember);
         final Lobby saved = this.lobbyRepository.save(lobby);
-        sendLobbyAndAccessTokenHolderToUserLobbyMember(userLobbyMember, saved);
-        callback.accept(lobby);
+        callback.accept(saved);
+        return createLobbyAndAccessTokenHolder(userLobbyMember, saved);
     }
 
     private UserLobbyMember createUserLobbyMember(final User user) {
         final UserLobbyMember userLobbyMember = new UserLobbyMember(user);
         return this.lobbyMemberRepository.save(userLobbyMember);
-    }
-
-    private void sendLobbyAndAccessTokenHolderToUserLobbyMember(final UserLobbyMember userLobbyMember,
-                                                                final Lobby lobby) {
-        this.userMessenger.unicast(
-                userLobbyMember.getUser(),
-                createLobbyAndAccessTokenHolder(userLobbyMember, lobby),
-                JacksonView.Read.class
-        );
     }
 
     private LobbyAndAccessTokenHolder createLobbyAndAccessTokenHolder(final UserLobbyMember userLobbyMember,

@@ -37,7 +37,7 @@ public class Lobby implements IWebSocketData, IEventContext<Lobby, LobbyEvent> {
     @JsonView(JacksonView.Read.class)
     @JsonIdentityReference(alwaysAsId = true)
     private UserLobbyMember owner;
-    @OneToMany(mappedBy = "lobby", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "lobby", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonView(JacksonView.Read.class)
     private Set<LobbyMember> members;
     @OneToOne(cascade = CascadeType.ALL)
