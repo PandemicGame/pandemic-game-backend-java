@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -45,8 +46,33 @@ public class GameService {
         this.roleService.createAllRoles();
     }
 
+    public GameOptions createDefaultGameOptions() {
+        final GameOptions gameOptions = new GameOptions();
+        addChoicesToGameOptions(gameOptions);
+        addDefaultChoicesToGameOptions(gameOptions);
+        return gameOptions;
+    }
+
+    public void addChoicesToGameOptions(final GameOptions gameOptions) {
+        gameOptions.setAvailableBoardTypes(this.boardTypeRepository.findAll());
+    }
+
+    private void addDefaultChoicesToGameOptions(final GameOptions gameOptions) {
+        final List<BoardType> boardTypes = gameOptions.getAvailableBoardTypes();
+        if (!boardTypes.isEmpty()) {
+            gameOptions.setSelectedBoardTypeId(boardTypes.get(0).getId());
+        }
+    }
+
     public void startGameInLobby(final Lobby lobby, final Consumer<Lobby> callback) {
-        final BoardType boardType = this.boardTypeRepository.findAll().get(0);
+        final GameOptions gameOptions = lobby.getGameOptions();
+
+        final Optional<BoardType> boardTypeOptional = this.boardTypeRepository.findById(gameOptions.getSelectedBoardTypeId());
+        if (boardTypeOptional.isEmpty()) {
+            return;
+        }
+
+        final BoardType boardType = boardTypeOptional.get();
         final List<LobbyMemberRoleAssociation> lobbyMemberRoleAssociations = createLobbyMemberRoleAssociations(lobby);
         final StartGameLobbyEvent startEvent = new StartGameLobbyEvent(boardType, lobbyMemberRoleAssociations);
 

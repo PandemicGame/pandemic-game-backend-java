@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import game.pandemic.chat.chats.LobbyChat;
 import game.pandemic.event.IEventContext;
 import game.pandemic.game.Game;
+import game.pandemic.game.GameOptions;
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.lobby.events.CreateLobbyEvent;
 import game.pandemic.lobby.events.LobbyEvent;
@@ -23,12 +24,12 @@ import java.util.Set;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Lobby implements IWebSocketData, IEventContext<Lobby, LobbyEvent> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonView(JacksonView.Read.class)
     private Long id;
-    @Getter
     @Setter
     @JsonView(JacksonView.Read.class)
     private String name;
@@ -46,15 +47,17 @@ public class Lobby implements IWebSocketData, IEventContext<Lobby, LobbyEvent> {
     private LobbyChat chat;
     @OneToOne(cascade = CascadeType.ALL)
     private CreateLobbyEvent creationEvent;
-    @Getter
     @Setter
     @JsonView(JacksonView.Read.class)
     private boolean isClosed;
-    @Getter
     @Setter
     @OneToOne(cascade = CascadeType.ALL)
     @JsonIdentityReference(alwaysAsId = true)
     private Game game;
+    @Setter
+    @OneToOne(cascade = CascadeType.ALL)
+    @JsonView(JacksonView.Read.class)
+    private GameOptions gameOptions;
 
     public Lobby(final CreateLobbyEvent creationEvent) {
         initialize();

@@ -2,6 +2,7 @@ package game.pandemic.lobby.events;
 
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonView;
+import game.pandemic.game.GameOptions;
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.lobby.Lobby;
 import game.pandemic.lobby.member.UserLobbyMember;
@@ -21,12 +22,15 @@ public class CreateLobbyEvent extends LobbyEvent {
     @JsonView(JacksonView.Read.class)
     @JsonIdentityReference(alwaysAsId = true)
     private UserLobbyMember owner;
+    @OneToOne
+    private GameOptions gameOptions;
 
     @Override
     public void apply(final Lobby lobby) {
         lobby.setName(this.name);
         lobby.setOwner(this.owner);
         lobby.addMember(this.owner);
+        lobby.setGameOptions(this.gameOptions);
     }
 
     public Lobby createLobby() {
