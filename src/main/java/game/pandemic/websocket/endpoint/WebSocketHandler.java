@@ -96,7 +96,7 @@ public abstract class WebSocketHandler<A extends IWebSocketAuthenticationObject>
     }
 
     protected void handleMessageWithAuthentication(final WebSocketSession session, final WebSocketMessage webSocketMessage, final A authenticationObject) {
-        delegateToEndpoints(webSocketMessage.getDestination(), authenticationObject, webSocketMessage.getPayload());
+        delegateToEndpoints(webSocketMessage.getDestination(), session, authenticationObject, webSocketMessage.getPayload());
     }
 
     protected void handleMessageWithoutAuthentication(final WebSocketSession session, final WebSocketMessage webSocketMessage) {

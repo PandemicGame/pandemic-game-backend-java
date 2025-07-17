@@ -8,6 +8,7 @@ import game.pandemic.jackson.JacksonView;
 import game.pandemic.jackson.ObjectMapper;
 import game.pandemic.websocket.auth.IWebSocketAuthenticationObject;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.WebSocketSession;
 
 @Component
 public class SendChatMessage<A extends ChatMessageSender & IWebSocketAuthenticationObject> extends ChatWebSocketControllerEndpoint<A> {
@@ -21,7 +22,7 @@ public class SendChatMessage<A extends ChatMessageSender & IWebSocketAuthenticat
     }
 
     @Override
-    public void consume(final A chatMessageSender, final String message) {
+    public void consume(final WebSocketSession session, final A chatMessageSender, final String message) {
         this.objectMapper.deserialize(
                 message,
                 ChatMessage.class,

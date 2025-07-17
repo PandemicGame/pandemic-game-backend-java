@@ -6,6 +6,7 @@ import game.pandemic.chat.websocket.ChatWebSocketControllerEndpoint;
 import game.pandemic.jackson.ObjectMapper;
 import game.pandemic.websocket.auth.IWebSocketAuthenticationObject;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.WebSocketSession;
 
 @Component
 public class FetchChat<A extends ChatMessageSender & IWebSocketAuthenticationObject> extends ChatWebSocketControllerEndpoint<A> {
@@ -19,7 +20,7 @@ public class FetchChat<A extends ChatMessageSender & IWebSocketAuthenticationObj
     }
 
     @Override
-    public void consume(final A chatMember, final String chatId) {
+    public void consume(final WebSocketSession session, final A chatMember, final String chatId) {
         this.chatService.sendChatWithIdToChatMember(chatMember, chatId);
     }
 }

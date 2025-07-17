@@ -8,6 +8,7 @@ import game.pandemic.lobby.member.UserLobbyMember;
 import game.pandemic.websocket.endpoint.IWebSocketEndpointConsumer;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.socket.WebSocketSession;
 
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class GameWebSocketControllerEndpoint implements IGameWebSocketControllerEndpoint, IWebSocketEndpointConsumer<UserLobbyMember> {
@@ -16,7 +17,7 @@ public abstract class GameWebSocketControllerEndpoint implements IGameWebSocketC
     protected final PlayerRepository playerRepository;
 
     @Override
-    public void consume(final UserLobbyMember userLobbyMember, final String message) {
+    public void consume(final WebSocketSession session, final UserLobbyMember userLobbyMember, final String message) {
         this.playerRepository.findByLobbyMember(userLobbyMember).ifPresent(player -> consume(player, message));
     }
 
