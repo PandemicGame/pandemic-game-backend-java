@@ -1,5 +1,6 @@
 package game.pandemic.game.player;
 
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import game.pandemic.game.board.Field;
 import game.pandemic.game.role.Role;
@@ -20,6 +21,8 @@ public class Player implements IWebSocketData {
     @OneToOne
     private LobbyMember lobbyMember;
     @ManyToOne
+    @JsonView(JacksonView.Read.class)
+    @JsonIdentityReference(alwaysAsId = true)
     private Field currentField;
     @ManyToOne
     @JsonView(JacksonView.Read.class)
