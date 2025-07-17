@@ -2,6 +2,7 @@ package game.pandemic.game.player;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import game.pandemic.game.board.Field;
+import game.pandemic.game.role.Role;
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.lobby.member.LobbyMember;
 import game.pandemic.websocket.IWebSocketData;
@@ -20,10 +21,14 @@ public class Player implements IWebSocketData {
     private LobbyMember lobbyMember;
     @ManyToOne
     private Field currentField;
+    @ManyToOne
+    @JsonView(JacksonView.Read.class)
+    private Role role;
 
-    public Player(final LobbyMember lobbyMember, final Field startingField) {
+    public Player(final LobbyMember lobbyMember, final Field startingField, final Role role) {
         this.lobbyMember = lobbyMember;
         this.currentField = startingField;
+        this.role = role;
     }
 
     public boolean containsLobbyMember(final LobbyMember lobbyMember) {
