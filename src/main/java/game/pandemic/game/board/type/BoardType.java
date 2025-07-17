@@ -1,7 +1,10 @@
 package game.pandemic.game.board.type;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import game.pandemic.game.board.location.Location;
 import game.pandemic.game.plague.Plague;
+import game.pandemic.jackson.JacksonView;
+import game.pandemic.websocket.IWebSocketData;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -15,10 +18,12 @@ import java.util.stream.Collectors;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class BoardType {
+public class BoardType implements IWebSocketData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(JacksonView.Read.class)
     private Long id;
+    @JsonView(JacksonView.Read.class)
     private String name;
     @ManyToOne
     private Location startingLocation;

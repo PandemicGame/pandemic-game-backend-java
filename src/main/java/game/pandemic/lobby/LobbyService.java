@@ -1,5 +1,6 @@
 package game.pandemic.lobby;
 
+import game.pandemic.game.GameOptions;
 import game.pandemic.game.GameService;
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.lobby.events.CreateLobbyEvent;
@@ -84,7 +85,7 @@ public class LobbyService {
     public LobbyAndAccessTokenHolder createLobby(final User user, final String name) {
         return addUserToLobbyAndProceed(
                 user,
-                m -> new CreateLobbyEvent(name, m).createLobby(),
+                m -> new CreateLobbyEvent(name, m, this.gameService.createDefaultGameOptions()).createLobby(),
                 l -> log.info("Created lobby with name: " + name)
         );
     }
@@ -147,15 +148,17 @@ public class LobbyService {
 
     @Transactional
     public void startGame(final UserLobbyMember userLobbyMember) {
-        this.lobbyRepository.findLobbyByMembersContaining(userLobbyMember).ifPresent(lobby -> startGame(lobby, userLobbyMember));
+        this.lobbyRepository.findLobbyByMembersContaining(userLobbyMember).ifPresent(
+                lobby -> executeIfLobbyMemberIsOwner(
+                        lobby,
+                        userLobbyMember,
+                        "start game",
+                        this::startGame
+                )
+        );
     }
 
-    private void startGame(final Lobby lobby, final UserLobbyMember userLobbyMember) {
-        if (!lobby.isOwner(userLobbyMember)) {
-            log.warn("Non-owner \"" + userLobbyMember.getName() + "\" cannot start a game in lobby \"" + lobby.getName() + "\".");
-            return;
-        }
-
+    private void startGame(final Lobby lobby) {
         if (lobby.getMembers().size() < 2) {
             log.warn("Cannot start game in lobby \"" + lobby.getName() + "\" as there are not enough members.");
             return;
@@ -166,5 +169,36 @@ public class LobbyService {
 
             log.info("A game was started in lobby \"" + saved.getName() + "\".");
         });
+    }
+
+    private void executeIfLobbyMemberIsOwner(final Lobby lobby, final LobbyMember lobbyMember, final String actionName, final Consumer<Lobby> callback) {
+        if (!lobby.isOwner(lobbyMember)) {
+            log.warn("Non-owner \"" + lobbyMember.getName() + "\" cannot execute the following action in lobby \"" + lobby.getName() + "\": " + actionName);
+            return;
+        }
+
+        callback.accept(lobby);
+    }
+
+    @Transactional
+    public void updateOptions(final UserLobbyMember userLobbyMember, final GameOptions gameOptions) {
+        this.lobbyRepository.findLobbyByMembersContaining(userLobbyMember).ifPresent(
+                lobby -> executeIfLobbyMemberIsOwner(
+                        lobby,
+                        userLobbyMember,
+                        "update options",
+                        l -> updateOptions(l, gameOptions)
+                )
+        );
+    }
+
+    private void updateOptions(final Lobby lobby, final GameOptions gameOptions) {
+        this.gameService.addChoicesToGameOptions(gameOptions);
+
+        lobby.setGameOptions(gameOptions);
+
+        final Lobby saved = this.lobbyRepository.save(lobby);
+
+        sendLobbyToMembers(saved);
     }
 }

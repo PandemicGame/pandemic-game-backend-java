@@ -7,6 +7,7 @@ import game.pandemic.lobby.LobbyService;
 import game.pandemic.lobby.websocket.LobbyWebSocketControllerEndpoint;
 import game.pandemic.messaging.messengers.IUnicastMessenger;
 import game.pandemic.user.User;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -24,6 +25,7 @@ public class FetchLobbies extends LobbyWebSocketControllerEndpoint<User> {
     }
 
     @Override
+    @Transactional
     public void consume(final WebSocketSession session, final User user, final String message) {
         final List<Lobby> lobbies = this.lobbyService.getAllLobbies();
         this.webSocketSessionMessenger.unicast(session, lobbies, JacksonView.Read.class);
