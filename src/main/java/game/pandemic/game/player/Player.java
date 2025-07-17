@@ -9,10 +9,12 @@ import game.pandemic.lobby.member.LobbyMember;
 import game.pandemic.websocket.IWebSocketData;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Player implements IWebSocketData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

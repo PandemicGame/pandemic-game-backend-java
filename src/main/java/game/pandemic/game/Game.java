@@ -6,22 +6,23 @@ import game.pandemic.game.board.Field;
 import game.pandemic.game.board.type.BoardType;
 import game.pandemic.game.plague.Plague;
 import game.pandemic.game.player.Player;
-import game.pandemic.game.role.Role;
+import game.pandemic.game.role.LobbyMemberRoleAssociation;
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.lobby.Lobby;
 import game.pandemic.lobby.member.LobbyMember;
 import game.pandemic.websocket.IWebSocketData;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Game implements IWebSocketData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,17 +39,21 @@ public class Game implements IWebSocketData {
     @JsonView(JacksonView.Read.class)
     private Board board;
 
-    public Game(final Lobby lobby, final BoardType boardType, final List<Role> roles) {
+    public Game(final Lobby lobby, final BoardType boardType, final List<LobbyMemberRoleAssociation> lobbyMemberRoleAssociations) {
         this.lobby = lobby;
         this.lobby.setGame(this);
         this.board = new Board(boardType);
-        this.playersInTurnOrder = createPlayersInTurnOrderList(new LinkedList<>(roles));
+        this.playersInTurnOrder = createPlayersInTurnOrderList(lobbyMemberRoleAssociations);
     }
 
-    private List<Player> createPlayersInTurnOrderList(final List<Role> roles) {
+    private List<Player> createPlayersInTurnOrderList(final List<LobbyMemberRoleAssociation> lobbyMemberRoleAssociations) {
         final Field startingField = this.board.getStartingField();
-        return this.lobby.getMembers().stream()
-                .map(member -> new Player(member, startingField, roles.remove(0)))
+        return lobbyMemberRoleAssociations.stream()
+                .map(lobbyMemberRoleAssociation -> new Player(
+                        lobbyMemberRoleAssociation.getLobbyMember(),
+                        startingField,
+                        lobbyMemberRoleAssociation.getRole()
+                ))
                 .toList();
     }
 
