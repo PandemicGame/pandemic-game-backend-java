@@ -1,4 +1,4 @@
-package game.pandemic.game.plague;
+package game.pandemic.util;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import game.pandemic.jackson.IJsonTypeInfo;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class PlagueColor implements IJsonTypeInfo {
+public class Color implements IJsonTypeInfo {
     public static final int MIN_VALUE = 0;
     public static final int MAX_VALUE = 255;
 
@@ -30,7 +30,7 @@ public class PlagueColor implements IJsonTypeInfo {
     @JsonView(JacksonView.Read.class)
     private int b;
 
-    public PlagueColor(final int r, final int g, final int b) throws IllegalArgumentException {
+    public Color(final int r, final int g, final int b) throws IllegalArgumentException {
         if (isInvalidValue(r) || isInvalidValue(g) || isInvalidValue(b)) {
             throw new IllegalArgumentException();
         }

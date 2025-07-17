@@ -3,6 +3,7 @@ package game.pandemic.game.plague;
 import com.fasterxml.jackson.annotation.JsonView;
 import game.pandemic.jackson.IJsonTypeInfo;
 import game.pandemic.jackson.JacksonView;
+import game.pandemic.util.Color;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -22,5 +23,5 @@ public class Plague implements IJsonTypeInfo {
     private String name;
     @Embedded
     @JsonView(JacksonView.Read.class)
-    private PlagueColor color;
+    private Color color;
 }
