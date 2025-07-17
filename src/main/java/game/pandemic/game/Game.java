@@ -2,9 +2,11 @@ package game.pandemic.game;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import game.pandemic.game.board.Board;
+import game.pandemic.game.board.Field;
 import game.pandemic.game.board.type.BoardType;
 import game.pandemic.game.plague.Plague;
 import game.pandemic.game.player.Player;
+import game.pandemic.game.role.Role;
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.lobby.Lobby;
 import game.pandemic.lobby.member.LobbyMember;
@@ -13,6 +15,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -35,16 +38,17 @@ public class Game implements IWebSocketData {
     @JsonView(JacksonView.Read.class)
     private Board board;
 
-    public Game(final Lobby lobby, final BoardType boardType) {
+    public Game(final Lobby lobby, final BoardType boardType, final List<Role> roles) {
         this.lobby = lobby;
         this.lobby.setGame(this);
         this.board = new Board(boardType);
-        this.playersInTurnOrder = createPlayersInTurnOrderList();
+        this.playersInTurnOrder = createPlayersInTurnOrderList(new LinkedList<>(roles));
     }
 
-    private List<Player> createPlayersInTurnOrderList() {
+    private List<Player> createPlayersInTurnOrderList(final List<Role> roles) {
+        final Field startingField = this.board.getStartingField();
         return this.lobby.getMembers().stream()
-                .map(member -> new Player(member, this.board.getStartingField()))
+                .map(member -> new Player(member, startingField, roles.remove(0)))
                 .toList();
     }
 
