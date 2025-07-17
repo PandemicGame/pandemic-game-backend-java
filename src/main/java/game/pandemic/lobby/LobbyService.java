@@ -1,14 +1,10 @@
 package game.pandemic.lobby;
 
-import game.pandemic.game.Game;
-import game.pandemic.game.GameAndPlayerHolder;
-import game.pandemic.game.board.type.BoardTypeRepository;
-import game.pandemic.game.role.RoleRepository;
+import game.pandemic.game.GameService;
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.lobby.events.CreateLobbyEvent;
 import game.pandemic.lobby.events.JoinLobbyEvent;
 import game.pandemic.lobby.events.LeaveLobbyEvent;
-import game.pandemic.lobby.events.StartGameLobbyEvent;
 import game.pandemic.lobby.member.LobbyMember;
 import game.pandemic.lobby.member.LobbyMemberRepository;
 import game.pandemic.lobby.member.UserLobbyMember;
@@ -38,8 +34,7 @@ public class LobbyService {
     private final LobbyMemberRepository lobbyMemberRepository;
     private final IGeneralPurposeMessenger<User> userMessenger;
     private final ILobbyMemberMessenger<LobbyMember> lobbyMemberMessenger;
-    private final BoardTypeRepository boardTypeRepository;
-    private final RoleRepository roleRepository;
+    private final GameService gameService;
 
     @PreDestroy
     private void onShutdown() {
@@ -166,23 +161,10 @@ public class LobbyService {
             return;
         }
 
-        lobby.processEvent(new StartGameLobbyEvent(this.boardTypeRepository.findAll().get(0), this.roleRepository.findAll()));
+        this.gameService.startGameInLobby(lobby, l -> {
+            final Lobby saved = this.lobbyRepository.save(l);
 
-        final Lobby saved = this.lobbyRepository.save(lobby);
-
-        log.info("A game was started in lobby \"" + saved.getName() + "\".");
-
-        saved.getMembers().forEach(member -> sendGameToMember(member, saved.getGame()));
-    }
-
-    private void sendGameToMember(final LobbyMember lobbyMember, final Game game) {
-        game.findPlayerByLobbyMember(lobbyMember).ifPresent(player -> this.lobbyMemberMessenger.unicast(
-                lobbyMember,
-                new GameAndPlayerHolder(
-                        game,
-                        player
-                ),
-                JacksonView.Read.class
-        ));
+            log.info("A game was started in lobby \"" + saved.getName() + "\".");
+        });
     }
 }
