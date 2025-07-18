@@ -2,6 +2,7 @@ package game.pandemic.game.board.type.factories;
 
 import game.pandemic.game.board.location.Location;
 import game.pandemic.game.board.location.LocationRepository;
+import game.pandemic.game.board.type.BoardSettings;
 import game.pandemic.game.board.type.BoardSlot;
 import game.pandemic.game.plague.Plague;
 import game.pandemic.game.plague.PlagueCode;
@@ -110,6 +111,23 @@ public class WorldMapBoardTypeFactory extends BoardTypeFactory {
                 new BoardSlot(126.59, 37.34, red, findLocationOrThrow(SEOUL), findLocationsOrThrow(TOKYO, BEIJING, SHANGHAI)),
                 new BoardSlot(116.23, 39.55, red, findLocationOrThrow(BEIJING), findLocationsOrThrow(SEOUL, SHANGHAI)),
                 new BoardSlot(121.30, 31.12, red, findLocationOrThrow(SHANGHAI), findLocationsOrThrow(BEIJING, SEOUL, TOKYO, TAIPEI, HONG_KONG))
+        );
+    }
+
+    @Override
+    protected BoardSettings createBoardSettings() {
+        return new BoardSettings(
+                125000,
+                1,
+                5,
+                3,
+                3,
+                0,
+                0,
+                -180,
+                180,
+                -85,
+                85
         );
     }
 }

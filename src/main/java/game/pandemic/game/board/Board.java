@@ -1,6 +1,7 @@
 package game.pandemic.game.board;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import game.pandemic.game.board.type.BoardSettings;
 import game.pandemic.game.board.type.BoardSlot;
 import game.pandemic.game.board.type.BoardType;
 import game.pandemic.game.plague.Plague;
@@ -59,5 +60,10 @@ public class Board implements IWebSocketData {
 
     public Set<Plague> getPlagues() {
         return this.type.getPlagues();
+    }
+
+    @JsonView(JacksonView.Read.class)
+    public BoardSettings getSettings() {
+        return this.type.getSettings();
     }
 }

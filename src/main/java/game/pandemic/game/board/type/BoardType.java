@@ -29,11 +29,14 @@ public class BoardType implements IWebSocketData {
     private Location startingLocation;
     @OneToMany(cascade = CascadeType.ALL)
     private List<BoardSlot> slots;
+    @Embedded
+    private BoardSettings settings;
 
-    public BoardType(final String name, final Location startingLocation, final List<BoardSlot> slots) {
+    public BoardType(final String name, final Location startingLocation, final List<BoardSlot> slots, final BoardSettings settings) {
         this.name = name;
         this.startingLocation = startingLocation;
         this.slots = slots;
+        this.settings = settings;
     }
 
     public Optional<BoardSlot> findBoardSlotForLocation(final Location location) {
