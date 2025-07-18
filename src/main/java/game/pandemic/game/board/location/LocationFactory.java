@@ -52,7 +52,10 @@ public class LocationFactory {
                 new Location(LocationCode.MILAN.getCode(), "Milan", ""),
                 new Location(LocationCode.SAINT_PETERSBURG.getCode(), "Saint Petersburg", ""),
                 new Location(LocationCode.MOSCOW.getCode(), "Moscow", ""),
-                new Location(LocationCode.ISTANBUL.getCode(), "Istanbul", "")
+                new Location(LocationCode.ISTANBUL.getCode(), "Istanbul", ""),
+                new Location(LocationCode.BORKUM_CORE.getCode(), "Borkum", ""),
+                new Location(LocationCode.BORKUM_REEDE.getCode(), "Reede (Borkum)", ""),
+                new Location(LocationCode.BORKUM_OSTLAND.getCode(), "Ostland (Borkum)", "")
         );
     }
 

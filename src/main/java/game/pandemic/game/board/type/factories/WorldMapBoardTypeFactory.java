@@ -1,40 +1,38 @@
-package game.pandemic.game.board.type;
+package game.pandemic.game.board.type.factories;
 
 import game.pandemic.game.board.location.Location;
-import game.pandemic.game.board.location.LocationCode;
 import game.pandemic.game.board.location.LocationRepository;
+import game.pandemic.game.board.type.BoardSlot;
 import game.pandemic.game.plague.Plague;
 import game.pandemic.game.plague.PlagueCode;
 import game.pandemic.game.plague.PlagueRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static game.pandemic.game.board.location.LocationCode.*;
 
 @Component
-@RequiredArgsConstructor
-public class WorldMapBoardTypeFactory {
-    public static final String WORLD_MAP_NAME = "World Map";
-    public static final double POSITION_ADJUSTMENT = 5.0;
-
-    private final LocationRepository locationRepository;
-    private final PlagueRepository plagueRepository;
-
-    public BoardType createWorldMap() throws BoardTypeCreationException {
-        try {
-            return new BoardType(WORLD_MAP_NAME, findLocationOrThrow(ATLANTA), createBoardSlots());
-        } catch (final NoSuchElementException e) {
-            throw new BoardTypeCreationException(e);
-        }
+public class WorldMapBoardTypeFactory extends BoardTypeFactory {
+    public WorldMapBoardTypeFactory(final LocationRepository locationRepository, final PlagueRepository plagueRepository) {
+        super(locationRepository, plagueRepository);
     }
 
-    private List<BoardSlot> createBoardSlots() throws NoSuchElementException {
+    @Override
+    protected String getName() {
+        return "World Map";
+    }
+
+    @Override
+    protected Location findStartingLocationOrThrow() throws NoSuchElementException {
+        return findLocationOrThrow(ATLANTA);
+    }
+
+    @Override
+    protected List<BoardSlot> createBoardSlots() throws NoSuchElementException {
         return Stream.of(
                 createBlue(),
                 createYellow(),
@@ -113,34 +111,5 @@ public class WorldMapBoardTypeFactory {
                 new BoardSlot(116.23, 39.55, red, findLocationOrThrow(BEIJING), findLocationsOrThrow(SEOUL, SHANGHAI)),
                 new BoardSlot(121.30, 31.12, red, findLocationOrThrow(SHANGHAI), findLocationsOrThrow(BEIJING, SEOUL, TOKYO, TAIPEI, HONG_KONG))
         );
-    }
-
-    private Location findLocationOrThrow(final LocationCode locationCode) throws NoSuchElementException {
-        return findLocation(locationCode).orElseThrow();
-    }
-
-    private Optional<Location> findLocation(final LocationCode locationCode) {
-        return this.locationRepository.findByCode(locationCode);
-    }
-
-    private List<Location> findLocationsOrThrow(final LocationCode... locationCodes) throws NoSuchElementException {
-        return findLocations(locationCodes).orElseThrow();
-    }
-
-    private Optional<List<Location>> findLocations(final LocationCode... locationCodes) {
-        final List<Location> locations = this.locationRepository.findAllByCodeIn(locationCodes);
-        if (locations.size() == locationCodes.length) {
-            return Optional.of(locations);
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    private Plague findPlagueOrThrow(final PlagueCode plagueCode) throws NoSuchElementException {
-        return findPlague(plagueCode).orElseThrow();
-    }
-
-    private Optional<Plague> findPlague(final PlagueCode plagueCode) {
-        return this.plagueRepository.findByCode(plagueCode);
     }
 }
