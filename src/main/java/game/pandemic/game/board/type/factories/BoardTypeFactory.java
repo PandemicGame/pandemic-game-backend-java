@@ -3,6 +3,7 @@ package game.pandemic.game.board.type.factories;
 import game.pandemic.game.board.location.Location;
 import game.pandemic.game.board.location.LocationCode;
 import game.pandemic.game.board.location.LocationRepository;
+import game.pandemic.game.board.type.BoardSettings;
 import game.pandemic.game.board.type.BoardSlot;
 import game.pandemic.game.board.type.BoardType;
 import game.pandemic.game.board.type.BoardTypeCreationException;
@@ -25,7 +26,7 @@ public abstract class BoardTypeFactory {
 
     public BoardType createBoardType() throws BoardTypeCreationException {
         try {
-            return new BoardType(getName(), findStartingLocationOrThrow(), createBoardSlots());
+            return new BoardType(getName(), findStartingLocationOrThrow(), createBoardSlots(), createBoardSettings());
         } catch (final NoSuchElementException e) {
             throw new BoardTypeCreationException(e);
         }
@@ -36,6 +37,8 @@ public abstract class BoardTypeFactory {
     protected abstract Location findStartingLocationOrThrow() throws NoSuchElementException;
 
     protected abstract List<BoardSlot> createBoardSlots() throws NoSuchElementException;
+
+    protected abstract BoardSettings createBoardSettings();
 
     protected Location findLocationOrThrow(final LocationCode locationCode) throws NoSuchElementException {
         return findLocation(locationCode).orElseThrow();
