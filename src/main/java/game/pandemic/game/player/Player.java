@@ -11,6 +11,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -22,6 +23,7 @@ public class Player implements IWebSocketData {
     private Long id;
     @OneToOne
     private LobbyMember lobbyMember;
+    @Setter
     @ManyToOne
     @JsonView(JacksonView.Read.class)
     @JsonIdentityReference(alwaysAsId = true)
