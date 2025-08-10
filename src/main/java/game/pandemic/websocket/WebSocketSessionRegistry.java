@@ -5,7 +5,10 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -17,8 +20,8 @@ public abstract class WebSocketSessionRegistry<A extends IWebSocketAuthenticatio
     private final Map<WebSocketSession, Long> sessionToAuthenticationObject = new ConcurrentHashMap<>();
 
     public void addSession(final WebSocketSession session, final A authenticationObject) {
-        this.authenticationObjectToSessions.computeIfAbsent(authenticationObject.getId(), a -> Collections.synchronizedSet(new HashSet<>())).add(session);
         addAuthenticationObjectToSession(session, authenticationObject);
+        this.authenticationObjectToSessions.computeIfAbsent(authenticationObject.getId(), a -> ConcurrentHashMap.newKeySet()).add(session);
         this.sessionToAuthenticationObject.put(session, authenticationObject.getId());
     }
 
