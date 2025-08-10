@@ -29,6 +29,7 @@ import java.util.function.Consumer;
 public class GameService {
     private final BoardTypeRepository boardTypeRepository;
     private final BoardTypeService boardTypeService;
+    private final GameRepository gameRepository;
     private final LocationService locationService;
     private final PlagueService plagueService;
     private final IUnicastMessenger<Player> playerMessenger;
@@ -79,7 +80,7 @@ public class GameService {
         lobby.processEvent(startEvent);
         callback.accept(lobby);
 
-        final Game game = lobby.getGame();
+        final Game game = this.gameRepository.save(startEvent.getGame());
         sendGameAndPlayerHolderToPlayers(game);
     }
 

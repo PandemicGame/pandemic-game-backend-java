@@ -28,9 +28,8 @@ public class Game implements IWebSocketData {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonView(JacksonView.Read.class)
     private Long id;
-    @OneToOne
     @JsonView(JacksonView.Read.class)
-    private Lobby lobby;
+    private Long lobbyId;
     @OneToMany(cascade = CascadeType.ALL)
     @OrderColumn(name = "player_index")
     @JsonView(JacksonView.Read.class)
@@ -40,8 +39,7 @@ public class Game implements IWebSocketData {
     private Board board;
 
     public Game(final Lobby lobby, final BoardType boardType, final List<LobbyMemberRoleAssociation> lobbyMemberRoleAssociations) {
-        this.lobby = lobby;
-        this.lobby.setGame(this);
+        this.lobbyId = lobby.getId();
         this.board = new Board(boardType);
         this.playersInTurnOrder = createPlayersInTurnOrderList(lobbyMemberRoleAssociations);
     }
