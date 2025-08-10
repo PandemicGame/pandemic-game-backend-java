@@ -7,6 +7,7 @@ import game.pandemic.game.board.type.BoardType;
 import game.pandemic.game.plague.Plague;
 import game.pandemic.game.player.Player;
 import game.pandemic.game.role.LobbyMemberRoleAssociation;
+import game.pandemic.game.turn.Turn;
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.lobby.Lobby;
 import game.pandemic.lobby.member.LobbyMember;
@@ -16,6 +17,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -34,14 +36,22 @@ public class Game implements IWebSocketData {
     @OrderColumn(name = "player_index")
     @JsonView(JacksonView.Read.class)
     private List<Player> playersInTurnOrder;
+    private int currentPlayerIndex;
     @OneToOne(cascade = CascadeType.ALL)
     @JsonView(JacksonView.Read.class)
     private Board board;
+    @OneToMany(cascade = CascadeType.ALL)
+    @OrderColumn(name = "turn_index")
+    @JsonView(JacksonView.Read.class)
+    private List<Turn> turns;
 
     public Game(final Lobby lobby, final BoardType boardType, final List<LobbyMemberRoleAssociation> lobbyMemberRoleAssociations) {
         this.lobbyId = lobby.getId();
         this.board = new Board(boardType);
         this.playersInTurnOrder = createPlayersInTurnOrderList(lobbyMemberRoleAssociations);
+        this.currentPlayerIndex = 0;
+        this.turns = new LinkedList<>();
+        this.turns.add(new Turn(getCurrentPlayer()));
     }
 
     private List<Player> createPlayersInTurnOrderList(final List<LobbyMemberRoleAssociation> lobbyMemberRoleAssociations) {
@@ -53,6 +63,14 @@ public class Game implements IWebSocketData {
                         lobbyMemberRoleAssociation.getRole()
                 ))
                 .toList();
+    }
+
+    public Player getCurrentPlayer() {
+        return this.playersInTurnOrder.get(this.currentPlayerIndex);
+    }
+
+    public boolean isCurrentPlayer(final Player player) {
+        return getCurrentPlayer().equals(player);
     }
 
     public Optional<Player> findPlayerByLobbyMember(final LobbyMember lobbyMember) {
