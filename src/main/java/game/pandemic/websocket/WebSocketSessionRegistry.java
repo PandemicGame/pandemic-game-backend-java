@@ -1,7 +1,6 @@
 package game.pandemic.websocket;
 
 import game.pandemic.websocket.auth.IWebSocketAuthenticationObject;
-import game.pandemic.websocket.auth.IWebSocketAuthenticationObjectRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.socket.WebSocketSession;
@@ -12,13 +11,14 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class WebSocketSessionRegistry<A extends IWebSocketAuthenticationObject> {
+    public static final String AUTHENTICATION_OBJECT_SESSION_ATTRIBUTE_NAME = "auth";
+
     private final Map<Long, Set<WebSocketSession>> authenticationObjectToSessions = new ConcurrentHashMap<>();
     private final Map<WebSocketSession, Long> sessionToAuthenticationObject = new ConcurrentHashMap<>();
 
-    private final IWebSocketAuthenticationObjectRepository<A> webSocketAuthenticationObjectRepository;
-
     public void addSession(final WebSocketSession session, final A authenticationObject) {
         this.authenticationObjectToSessions.computeIfAbsent(authenticationObject.getId(), a -> Collections.synchronizedSet(new HashSet<>())).add(session);
+        addAuthenticationObjectToSession(session, authenticationObject);
         this.sessionToAuthenticationObject.put(session, authenticationObject.getId());
     }
 
@@ -40,12 +40,7 @@ public abstract class WebSocketSessionRegistry<A extends IWebSocketAuthenticatio
     }
 
     public Optional<A> findAuthenticationObjectForSession(final WebSocketSession session) {
-        final Long id = this.sessionToAuthenticationObject.get(session);
-        if (id != null) {
-            return this.webSocketAuthenticationObjectRepository.findById(id);
-        } else {
-            return Optional.empty();
-        }
+        return convertSessionToAuthenticationObject(session);
     }
 
     public Set<WebSocketSession> findAllSessions() {
@@ -53,10 +48,23 @@ public abstract class WebSocketSessionRegistry<A extends IWebSocketAuthenticatio
     }
 
     public Set<A> findAllAuthenticationObjects() {
-        return this.authenticationObjectToSessions.keySet().stream()
-                .map(this.webSocketAuthenticationObjectRepository::findById)
+        return this.sessionToAuthenticationObject.keySet().stream()
+                .map(this::convertSessionToAuthenticationObject)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toSet());
+    }
+
+    protected void addAuthenticationObjectToSession(final WebSocketSession session, final A authenticationObject) {
+        session.getAttributes().put(AUTHENTICATION_OBJECT_SESSION_ATTRIBUTE_NAME, authenticationObject);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Optional<A> convertSessionToAuthenticationObject(final WebSocketSession session) {
+        final Object authenticationObjectValue = session.getAttributes().get(AUTHENTICATION_OBJECT_SESSION_ATTRIBUTE_NAME);
+        if (authenticationObjectValue instanceof IWebSocketAuthenticationObject) {
+            return Optional.of((A) authenticationObjectValue);
+        }
+        return Optional.empty();
     }
 }
