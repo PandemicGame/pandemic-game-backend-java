@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import game.pandemic.chat.chats.LobbyChat;
 import game.pandemic.event.IEventContext;
-import game.pandemic.game.Game;
 import game.pandemic.game.GameOptions;
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.lobby.events.CreateLobbyEvent;
@@ -52,10 +51,6 @@ public class Lobby implements IWebSocketData, IEventContext<Lobby, LobbyEvent> {
     private boolean isClosed;
     @Setter
     @OneToOne(cascade = CascadeType.ALL)
-    @JsonIdentityReference(alwaysAsId = true)
-    private Game game;
-    @Setter
-    @OneToOne(cascade = CascadeType.ALL)
     @JsonView(JacksonView.Read.class)
     private GameOptions gameOptions;
 
@@ -69,7 +64,6 @@ public class Lobby implements IWebSocketData, IEventContext<Lobby, LobbyEvent> {
     private void initialize() {
         this.members = new HashSet<>();
         this.isClosed = false;
-        this.game = null;
     }
 
     @Override
