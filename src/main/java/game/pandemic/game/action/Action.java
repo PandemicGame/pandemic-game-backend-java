@@ -1,8 +1,7 @@
-package game.pandemic.game.turn;
+package game.pandemic.game.action;
 
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonView;
-import game.pandemic.game.action.Action;
+import game.pandemic.game.action.effect.ActionEffect;
 import game.pandemic.game.player.Player;
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.websocket.IWebSocketData;
@@ -11,26 +10,25 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.LinkedList;
 import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Turn implements IWebSocketData {
+public abstract class Action implements IWebSocketData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    @JsonView(JacksonView.Read.class)
-    @JsonIdentityReference(alwaysAsId = true)
-    private Player player;
+    protected Player executingPlayer;
     @OneToMany(cascade = CascadeType.ALL)
     @JsonView(JacksonView.Read.class)
-    private List<Action> availableActions;
+    private List<ActionEffect> availableEffects;
 
-    public Turn(final Player player) {
-        this.player = player;
-        this.availableActions = new LinkedList<>();
+    protected Action(final Player executingPlayer) {
+        this.executingPlayer = executingPlayer;
+        this.availableEffects = createAvailableEffects();
     }
+
+    protected abstract List<ActionEffect> createAvailableEffects();
 }
