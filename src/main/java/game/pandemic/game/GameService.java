@@ -1,10 +1,12 @@
 package game.pandemic.game;
 
+import game.pandemic.game.action.effect.ActionEffectRepository;
 import game.pandemic.game.board.location.LocationService;
 import game.pandemic.game.board.type.BoardType;
 import game.pandemic.game.board.type.BoardTypeRepository;
 import game.pandemic.game.board.type.BoardTypeService;
 import game.pandemic.game.events.CreateGameEvent;
+import game.pandemic.game.events.ExecuteActionEffectGameEvent;
 import game.pandemic.game.plague.PlagueService;
 import game.pandemic.game.player.Player;
 import game.pandemic.game.role.LobbyMemberRoleAssociation;
@@ -16,6 +18,7 @@ import game.pandemic.lobby.Lobby;
 import game.pandemic.lobby.events.StartGameLobbyEvent;
 import game.pandemic.messaging.messengers.IUnicastMessenger;
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,11 +26,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
 @Service
 @RequiredArgsConstructor
 public class GameService {
+    private final ActionEffectRepository actionEffectRepository;
     private final BoardTypeRepository boardTypeRepository;
     private final BoardTypeService boardTypeService;
     private final GameRepository gameRepository;
@@ -126,5 +131,32 @@ public class GameService {
                 ),
                 JacksonView.Read.class
         );
+    }
+
+    @Transactional
+    public void executeActionEffect(final Player player, final Long actionEffectId) {
+        executeInGameOfPlayer(player, game -> {
+            if (game.isCurrentPlayer(player)) {
+                createAndProcessExecuteActionEffectGameEvent(game, actionEffectId);
+            }
+        });
+    }
+
+    private void executeInGameOfPlayer(final Player player, final Consumer<Game> callback) {
+        this.gameRepository.findByPlayersInTurnOrderContaining(player).ifPresent(callback);
+    }
+
+    private void createAndProcessExecuteActionEffectGameEvent(final Game game, final Long actionEffectId) {
+        this.actionEffectRepository.findById(actionEffectId).ifPresent(actionEffect -> {
+            game.processEvent(new ExecuteActionEffectGameEvent(actionEffect));
+            final Game saved = this.gameRepository.save(game);
+            sendGameToPlayers(saved);
+        });
+    }
+
+    private void sendGameToPlayers(final Game game) {
+        for (final Player player : game.getPlayersInTurnOrder()) {
+            this.playerMessenger.unicast(player, game);
+        }
     }
 }
