@@ -4,6 +4,7 @@ import game.pandemic.game.board.location.LocationService;
 import game.pandemic.game.board.type.BoardType;
 import game.pandemic.game.board.type.BoardTypeRepository;
 import game.pandemic.game.board.type.BoardTypeService;
+import game.pandemic.game.events.CreateGameEvent;
 import game.pandemic.game.plague.PlagueService;
 import game.pandemic.game.player.Player;
 import game.pandemic.game.role.LobbyMemberRoleAssociation;
