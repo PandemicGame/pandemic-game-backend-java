@@ -1,9 +1,12 @@
 package game.pandemic.game;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import game.pandemic.event.IEventContext;
 import game.pandemic.game.board.Board;
 import game.pandemic.game.board.Field;
 import game.pandemic.game.board.type.BoardType;
+import game.pandemic.game.events.CreateGameEvent;
+import game.pandemic.game.events.GameEvent;
 import game.pandemic.game.plague.Plague;
 import game.pandemic.game.player.Player;
 import game.pandemic.game.role.LobbyMemberRoleAssociation;
@@ -25,7 +28,7 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Game implements IWebSocketData {
+public class Game implements IWebSocketData, IEventContext<Game, GameEvent> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonView(JacksonView.Read.class)
@@ -44,8 +47,15 @@ public class Game implements IWebSocketData {
     @OrderColumn(name = "turn_index")
     @JsonView(JacksonView.Read.class)
     private List<Turn> turns;
+    @OneToOne(cascade = CascadeType.ALL)
+    private CreateGameEvent creationEvent;
 
-    public Game(final Lobby lobby, final BoardType boardType, final List<LobbyMemberRoleAssociation> lobbyMemberRoleAssociations) {
+    public Game(final CreateGameEvent creationEvent) {
+        this.creationEvent = creationEvent;
+        this.creationEvent.apply(this);
+    }
+
+    public void initialize(final Lobby lobby, final BoardType boardType, final List<LobbyMemberRoleAssociation> lobbyMemberRoleAssociations) {
         this.lobbyId = lobby.getId();
         this.board = new Board(boardType);
         this.playersInTurnOrder = createPlayersInTurnOrderList(lobbyMemberRoleAssociations);
@@ -82,5 +92,21 @@ public class Game implements IWebSocketData {
     @JsonView(JacksonView.Read.class)
     public Set<Plague> getPlagues() {
         return this.board.getPlagues();
+    }
+
+    @Override
+    public void processEvent(final GameEvent event) {
+        this.creationEvent.appendEvent(event);
+        event.apply(this);
+    }
+
+    @Override
+    public void reset() {
+        this.creationEvent.apply(this);
+    }
+
+    @Override
+    public void restore() {
+        this.creationEvent.applyAll(this);
     }
 }
