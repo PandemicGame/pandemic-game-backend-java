@@ -55,8 +55,12 @@ public class Field implements IWebSocketData {
 
     @JsonView(JacksonView.Read.class)
     public List<Long> getConnectionIds() {
-        return this.board.getConnectionsForField(this).stream()
+        return getConnections().stream()
                 .map(Field::getId)
                 .toList();
+    }
+
+    public List<Field> getConnections() {
+        return this.board.getConnectionsForField(this);
     }
 }
