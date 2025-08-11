@@ -18,7 +18,7 @@ public abstract class Event<C extends IEventContext<C, E>, E extends Event<C, E>
     private Long id;
     @Setter
     @JsonView(JacksonView.Read.class)
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     protected E nextEvent;
 
     public abstract void apply(final C context);
