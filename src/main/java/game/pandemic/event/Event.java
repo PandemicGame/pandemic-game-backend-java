@@ -41,4 +41,12 @@ public abstract class Event<C extends IEventContext<C, E>, E extends Event<C, E>
             this.nextEvent = event;
         }
     }
+
+    public Event<C, E> getLastEvent() {
+        if (hasNextEvent()) {
+            return this.nextEvent.getLastEvent();
+        } else {
+            return this;
+        }
+    }
 }

@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 
 @Service
 @RequiredArgsConstructor
@@ -65,23 +65,36 @@ public class GameService {
         }
     }
 
-    public void startGameInLobby(final Lobby lobby, final Consumer<Lobby> callback) {
+    public void startGameInLobby(final Lobby lobby, final UnaryOperator<Lobby> callback) {
+        createStartGameLobbyEvent(lobby).ifPresent(startGameLobbyEvent -> {
+            lobby.processEvent(startGameLobbyEvent);
+            final Lobby saved = callback.apply(lobby);
+
+            createGame(saved);
+        });
+    }
+
+    private Optional<StartGameLobbyEvent> createStartGameLobbyEvent(final Lobby lobby) {
         final GameOptions gameOptions = lobby.getGameOptions();
 
         final Optional<BoardType> boardTypeOptional = this.boardTypeRepository.findById(gameOptions.getSelectedBoardTypeId());
         if (boardTypeOptional.isEmpty()) {
-            return;
+            return Optional.empty();
         }
 
         final BoardType boardType = boardTypeOptional.get();
         final List<LobbyMemberRoleAssociation> lobbyMemberRoleAssociations = createLobbyMemberRoleAssociations(lobby);
         final StartGameLobbyEvent startEvent = new StartGameLobbyEvent(boardType, lobbyMemberRoleAssociations);
 
-        lobby.processEvent(startEvent);
-        callback.accept(lobby);
+        return Optional.of(startEvent);
+    }
 
-        final Game game = this.gameRepository.save(startEvent.getGame());
-        sendGameAndPlayerHolderToPlayers(game);
+    private void createGame(final Lobby lobby) {
+        if (lobby.getCreationEvent().getLastEvent() instanceof StartGameLobbyEvent startGameLobbyEvent) {
+            final CreateGameEvent createGameEvent = startGameLobbyEvent.getCreateGameEvent();
+            final Game game = this.gameRepository.save(createGameEvent.createGame());
+            sendGameAndPlayerHolderToPlayers(game);
+        }
     }
 
     private List<LobbyMemberRoleAssociation> createLobbyMemberRoleAssociations(final Lobby lobby) {

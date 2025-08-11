@@ -168,6 +168,8 @@ public class LobbyService {
             final Lobby saved = this.lobbyRepository.save(l);
 
             log.info("A game was started in lobby \"" + saved.getName() + "\".");
+
+            return saved;
         });
     }
 
