@@ -8,18 +8,17 @@ import game.pandemic.jackson.JacksonView;
 import game.pandemic.lobby.member.LobbyMember;
 import game.pandemic.websocket.IWebSocketData;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Player implements IWebSocketData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonView(JacksonView.Read.class)
+    @EqualsAndHashCode.Include
     private Long id;
     @OneToOne
     private LobbyMember lobbyMember;
