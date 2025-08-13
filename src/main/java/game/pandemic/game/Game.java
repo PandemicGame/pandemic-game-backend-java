@@ -6,6 +6,7 @@ import game.pandemic.game.board.Board;
 import game.pandemic.game.board.Field;
 import game.pandemic.game.board.type.BoardType;
 import game.pandemic.game.events.CreateGameEvent;
+import game.pandemic.game.events.CreateTurnGameEvent;
 import game.pandemic.game.events.GameEvent;
 import game.pandemic.game.plague.Plague;
 import game.pandemic.game.player.Player;
@@ -44,6 +45,7 @@ public class Game implements IWebSocketData, IEventContext<Game, GameEvent> {
     @JsonView(JacksonView.Read.class)
     private Board board;
     @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "game_id")
     @OrderColumn(name = "turn_index")
     @JsonView(JacksonView.Read.class)
     private List<Turn> turns;
@@ -61,7 +63,7 @@ public class Game implements IWebSocketData, IEventContext<Game, GameEvent> {
         this.playersInTurnOrder = createPlayersInTurnOrderList(lobbyMemberRoleAssociations);
         this.currentPlayerIndex = 0;
         this.turns = new LinkedList<>();
-        this.turns.add(new Turn(getCurrentPlayer()));
+        processEvent(new CreateTurnGameEvent(this));
     }
 
     private List<Player> createPlayersInTurnOrderList(final List<LobbyMemberRoleAssociation> lobbyMemberRoleAssociations) {
@@ -92,6 +94,10 @@ public class Game implements IWebSocketData, IEventContext<Game, GameEvent> {
     @JsonView(JacksonView.Read.class)
     public Set<Plague> getPlagues() {
         return this.board.getPlagues();
+    }
+
+    public void addTurn(final Turn turn) {
+        this.turns.add(turn);
     }
 
     @Override
