@@ -17,6 +17,7 @@ public class ExecuteActionEffectGameEvent extends GameEvent {
 
     @Override
     public void apply(final Game game) {
-        this.actionEffect.execute();
+        final GameEvent event = this.actionEffect.createEvent();
+        event.applyAll(game);
     }
 }
