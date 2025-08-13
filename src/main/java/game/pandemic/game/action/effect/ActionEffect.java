@@ -1,6 +1,7 @@
 package game.pandemic.game.action.effect;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import game.pandemic.game.events.GameEvent;
 import game.pandemic.game.player.Player;
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.websocket.IWebSocketData;
@@ -22,5 +23,5 @@ public abstract class ActionEffect implements IWebSocketData {
         this.executingPlayer = executingPlayer;
     }
 
-    public abstract void execute();
+    public abstract GameEvent createEvent();
 }
