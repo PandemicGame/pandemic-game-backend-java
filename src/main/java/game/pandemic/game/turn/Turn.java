@@ -2,7 +2,9 @@ package game.pandemic.game.turn;
 
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonView;
+import game.pandemic.game.Game;
 import game.pandemic.game.action.Action;
+import game.pandemic.game.events.CreateTurnGameEvent;
 import game.pandemic.game.player.Player;
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.websocket.IWebSocketData;
@@ -22,15 +24,25 @@ public class Turn implements IWebSocketData {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
+    private Game game;
+    @ManyToOne
     @JsonView(JacksonView.Read.class)
     @JsonIdentityReference(alwaysAsId = true)
     private Player player;
     @OneToMany(cascade = CascadeType.ALL)
     @JsonView(JacksonView.Read.class)
     private List<Action> availableActions;
+    @OneToOne(cascade = CascadeType.ALL)
+    private CreateTurnGameEvent creationEvent;
 
-    public Turn(final Player player) {
-        this.player = player;
+    public Turn(final CreateTurnGameEvent creationEvent) {
+        this.creationEvent = creationEvent;
+        initialize();
+    }
+
+    private void initialize() {
+        this.game = this.creationEvent.getGame();
+        this.player = this.game.getCurrentPlayer();
         this.availableActions = new LinkedList<>();
     }
 }
