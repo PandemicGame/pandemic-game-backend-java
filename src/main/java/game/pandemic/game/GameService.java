@@ -156,7 +156,7 @@ public class GameService {
 
     private void sendGameToPlayers(final Game game) {
         for (final Player player : game.getPlayersInTurnOrder()) {
-            this.playerMessenger.unicast(player, game);
+            this.playerMessenger.unicast(player, game, JacksonView.Read.class);
         }
     }
 }
