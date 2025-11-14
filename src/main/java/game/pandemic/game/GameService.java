@@ -98,7 +98,7 @@ public class GameService {
     }
 
     private void createGame(final Lobby lobby) {
-        if (lobby.getCreationEvent().getLastEvent() instanceof StartGameLobbyEvent startGameLobbyEvent) {
+        if (lobby.getLastEvent() instanceof StartGameLobbyEvent startGameLobbyEvent) {
             final CreateGameEvent createGameEvent = startGameLobbyEvent.getCreateGameEvent();
             final Game game = this.gameRepository.save(createGameEvent.createGame());
             sendGameAndPlayerHolderToPlayers(game);
