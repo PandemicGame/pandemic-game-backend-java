@@ -5,6 +5,7 @@ import game.pandemic.game.board.location.LocationService;
 import game.pandemic.game.board.type.BoardType;
 import game.pandemic.game.board.type.BoardTypeRepository;
 import game.pandemic.game.board.type.BoardTypeService;
+import game.pandemic.game.board.type.factories.WorldMapBoardTypeFactory;
 import game.pandemic.game.events.CreateGameEvent;
 import game.pandemic.game.events.ExecuteActionEffectGameEvent;
 import game.pandemic.game.plague.PlagueService;
@@ -66,9 +67,10 @@ public class GameService {
 
     private void addDefaultChoicesToGameOptions(final GameOptions gameOptions) {
         final List<BoardType> boardTypes = gameOptions.getAvailableBoardTypes();
-        if (!boardTypes.isEmpty()) {
-            gameOptions.setSelectedBoardTypeId(boardTypes.get(0).getId());
-        }
+        boardTypes.stream()
+                .filter(boardType -> boardType.getName().equals(WorldMapBoardTypeFactory.NAME))
+                .findFirst()
+                .ifPresent(boardType -> gameOptions.setSelectedBoardTypeId(boardType.getId()));
     }
 
     public void startGameInLobby(final Lobby lobby, final UnaryOperator<Lobby> callback) {

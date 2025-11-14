@@ -18,13 +18,15 @@ import static game.pandemic.game.board.location.LocationCode.*;
 
 @Component
 public class WorldMapBoardTypeFactory extends BoardTypeFactory {
+    public static final String NAME = "World Map";
+
     public WorldMapBoardTypeFactory(final LocationRepository locationRepository, final PlagueRepository plagueRepository) {
         super(locationRepository, plagueRepository);
     }
 
     @Override
     protected String getName() {
-        return "World Map";
+        return NAME;
     }
 
     @Override
