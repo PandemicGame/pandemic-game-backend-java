@@ -30,6 +30,8 @@ import java.util.Set;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Game implements IWebSocketData, IEventContext<Game, GameEvent> {
+    public static final int DEFAULT_NUMBER_OF_ACTIONS_PER_TURN = 4;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonView(JacksonView.Read.class)
@@ -44,6 +46,7 @@ public class Game implements IWebSocketData, IEventContext<Game, GameEvent> {
     @OneToOne(cascade = CascadeType.ALL)
     @JsonView(JacksonView.Read.class)
     private Board board;
+    private int numberOfActionsPerTurn;
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "game_id")
     @OrderColumn(name = "turn_index")
@@ -57,9 +60,10 @@ public class Game implements IWebSocketData, IEventContext<Game, GameEvent> {
         this.creationEvent.apply(this);
     }
 
-    public void initialize(final Lobby lobby, final BoardType boardType, final List<LobbyMemberRoleAssociation> lobbyMemberRoleAssociations) {
+    public void initialize(final Lobby lobby, final BoardType boardType, final int numberOfActionsPerTurn, final List<LobbyMemberRoleAssociation> lobbyMemberRoleAssociations) {
         this.lobbyId = lobby.getId();
         this.board = new Board(boardType);
+        this.numberOfActionsPerTurn = numberOfActionsPerTurn;
         this.playersInTurnOrder = createPlayersInTurnOrderList(lobbyMemberRoleAssociations);
         this.currentPlayerIndex = 0;
         this.turns = new LinkedList<>();
