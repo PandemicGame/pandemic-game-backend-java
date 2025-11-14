@@ -34,7 +34,7 @@ public class ActionPhase extends Phase<ActionPhase> {
 
     @Override
     protected boolean isOver() {
-        return false;
+        return this.steps.size() == this.numberOfActionExecutionSteps;
     }
 
     @Override
