@@ -1,5 +1,6 @@
 package game.pandemic.game.turn.phase;
 
+import game.pandemic.game.events.StartPhaseGameEvent;
 import game.pandemic.game.player.Player;
 import game.pandemic.game.turn.Turn;
 import jakarta.persistence.*;
@@ -38,6 +39,7 @@ public abstract class Phase {
     protected abstract boolean isOver();
 
     protected void switchToNextPhase() {
+        this.turn.processEvent(new StartPhaseGameEvent(this.turn, createNextPhase()));
     }
 
     protected abstract Phase createNextPhase();
