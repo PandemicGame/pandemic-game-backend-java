@@ -63,7 +63,7 @@ public class Game implements IWebSocketData, IEventContext<Game, GameEvent> {
         this.playersInTurnOrder = createPlayersInTurnOrderList(lobbyMemberRoleAssociations);
         this.currentPlayerIndex = 0;
         this.turns = new LinkedList<>();
-        processEvent(new CreateTurnGameEvent(this));
+        processEvent(new CreateTurnGameEvent());
     }
 
     private List<Player> createPlayersInTurnOrderList(final List<LobbyMemberRoleAssociation> lobbyMemberRoleAssociations) {
