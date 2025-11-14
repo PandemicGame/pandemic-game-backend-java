@@ -26,7 +26,7 @@ public abstract class Event<C extends IEventContext<C, E>, E extends Event<C, E>
     public void applyAll(final C context) {
         this.apply(context);
         if (hasNextEvent()) {
-            this.nextEvent.apply(context);
+            this.nextEvent.applyAll(context);
         }
     }
 
