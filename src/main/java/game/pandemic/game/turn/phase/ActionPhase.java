@@ -11,7 +11,7 @@ import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ActionPhase extends Phase {
+public class ActionPhase extends Phase<ActionPhase> {
     private int numberOfActionExecutionSteps;
 
     public ActionPhase(final Turn turn, final int numberOfActionExecutionSteps) {
@@ -25,7 +25,7 @@ public class ActionPhase extends Phase {
     }
 
     @Override
-    protected Phase createNextPhase() {
+    protected ActionPhase createNextPhase() {
         return new ActionPhase(this.turn, this.numberOfActionExecutionSteps);
     }
 
