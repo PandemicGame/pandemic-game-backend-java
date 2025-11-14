@@ -100,6 +100,10 @@ public class Game implements IWebSocketData, IEventContext<Game, GameEvent> {
         return this.board.getPlagues();
     }
 
+    public Turn getCurrentTurn() {
+        return this.turns.get(this.turns.size() - 1);
+    }
+
     public void addTurn(final Turn turn) {
         this.turns.add(turn);
     }
