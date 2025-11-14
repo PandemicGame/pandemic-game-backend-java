@@ -52,12 +52,13 @@ public class Game implements IWebSocketData, IEventContext<Game, GameEvent> {
     @OrderColumn(name = "turn_index")
     @JsonView(JacksonView.Read.class)
     private List<Turn> turns;
-    @OneToOne(cascade = CascadeType.ALL)
-    private CreateGameEvent creationEvent;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<GameEvent> eventChain;
 
     public Game(final CreateGameEvent creationEvent) {
-        this.creationEvent = creationEvent;
-        this.creationEvent.apply(this);
+        this.eventChain = new LinkedList<>();
+        this.eventChain.add(creationEvent);
+        creationEvent.apply(this);
     }
 
     public void initialize(final Lobby lobby, final BoardType boardType, final int numberOfActionsPerTurn, final List<LobbyMemberRoleAssociation> lobbyMemberRoleAssociations) {
@@ -110,17 +111,17 @@ public class Game implements IWebSocketData, IEventContext<Game, GameEvent> {
 
     @Override
     public void processEvent(final GameEvent event) {
-        this.creationEvent.appendEvent(event);
+        this.eventChain.add(event);
         event.apply(this);
     }
 
     @Override
     public void reset() {
-        this.creationEvent.apply(this);
+        this.eventChain.get(0).apply(this);
     }
 
     @Override
     public void restore() {
-        this.creationEvent.applyAll(this);
+        this.eventChain.forEach(event -> event.apply(this));
     }
 }

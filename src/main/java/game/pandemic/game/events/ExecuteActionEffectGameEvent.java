@@ -18,7 +18,7 @@ public class ExecuteActionEffectGameEvent extends GameEvent {
     @Override
     public void apply(final Game game) {
         final GameEvent event = this.actionEffect.createEvent();
-        event.applyAll(game);
+        game.processEvent(event);
         game.getCurrentTurn().getCurrentPhase().next();
     }
 }

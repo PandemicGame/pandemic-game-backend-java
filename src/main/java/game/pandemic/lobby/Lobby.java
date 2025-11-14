@@ -17,9 +17,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -44,8 +42,8 @@ public class Lobby implements IWebSocketData, IEventContext<Lobby, LobbyEvent> {
     @JsonView(JacksonView.Read.class)
     @JsonIdentityReference(alwaysAsId = true)
     private LobbyChat chat;
-    @OneToOne(cascade = CascadeType.ALL)
-    private CreateLobbyEvent creationEvent;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<LobbyEvent> eventChain;
     @Setter
     @JsonView(JacksonView.Read.class)
     private boolean isClosed;
@@ -57,8 +55,9 @@ public class Lobby implements IWebSocketData, IEventContext<Lobby, LobbyEvent> {
     public Lobby(final CreateLobbyEvent creationEvent) {
         initialize();
         this.chat = new LobbyChat(this);
-        this.creationEvent = creationEvent;
-        this.creationEvent.apply(this);
+        this.eventChain = new LinkedList<>();
+        this.eventChain.add(creationEvent);
+        creationEvent.apply(this);
     }
 
     private void initialize() {
@@ -66,21 +65,25 @@ public class Lobby implements IWebSocketData, IEventContext<Lobby, LobbyEvent> {
         this.isClosed = false;
     }
 
+    public LobbyEvent getLastEvent() {
+        return this.eventChain.get(this.eventChain.size() - 1);
+    }
+
     @Override
     public void processEvent(final LobbyEvent event) {
-        this.creationEvent.appendEvent(event);
+        this.eventChain.add(event);
         event.apply(this);
     }
 
     @Override
     public void reset() {
         initialize();
-        this.creationEvent.apply(this);
+        this.eventChain.get(0).apply(this);
     }
 
     @Override
     public void restore() {
-        this.creationEvent.applyAll(this);
+        this.eventChain.forEach(event -> event.apply(this));
     }
 
     public boolean isOwner(final LobbyMember lobbyMember) {
