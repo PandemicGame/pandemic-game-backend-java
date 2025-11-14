@@ -1,7 +1,10 @@
 package game.pandemic.game.turn.phase;
 
 import game.pandemic.game.action.Action;
+import game.pandemic.game.events.StartStepGameEvent;
 import game.pandemic.game.turn.Turn;
+import game.pandemic.game.turn.phase.step.ActionExecutionStep;
+import game.pandemic.game.turn.phase.step.Step;
 import jakarta.persistence.Entity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -16,7 +19,17 @@ public class ActionPhase extends Phase<ActionPhase> {
 
     public ActionPhase(final Turn turn, final int numberOfActionExecutionSteps) {
         super(turn);
+        turn.processEvent(new StartStepGameEvent<>(this, new ActionExecutionStep(this)));
         this.numberOfActionExecutionSteps = numberOfActionExecutionSteps;
+    }
+
+    @Override
+    public void next() {
+        if (!isOver()) {
+            this.turn.processEvent(new StartStepGameEvent<>(this, new ActionExecutionStep(this)));
+        } else {
+            switchToNextPhase();
+        }
     }
 
     @Override
@@ -30,6 +43,10 @@ public class ActionPhase extends Phase<ActionPhase> {
     }
 
     public List<Action> getAvailableActions() {
+        final Step<ActionPhase> step = getCurrentStep();
+        if (step instanceof ActionExecutionStep actionExecutionStep) {
+            return actionExecutionStep.getAvailableActions();
+        }
         return new LinkedList<>();
     }
 }
