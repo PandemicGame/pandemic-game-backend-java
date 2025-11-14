@@ -23,6 +23,7 @@ public class CreateGameEvent extends GameEvent {
         game.initialize(
                 this.lobby,
                 this.startGameLobbyEvent.getBoardType(),
+                Game.DEFAULT_NUMBER_OF_ACTIONS_PER_TURN,
                 this.startGameLobbyEvent.getLobbyMemberRoleAssociations()
         );
     }
