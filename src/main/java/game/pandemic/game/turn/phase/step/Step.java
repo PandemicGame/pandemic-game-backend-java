@@ -9,14 +9,14 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public abstract class Step {
+public abstract class Step<P extends Phase<P>> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    protected Phase phase;
+    protected P phase;
 
-    protected Step(final Phase phase) {
+    protected Step(final P phase) {
         this.phase = phase;
     }
 }
