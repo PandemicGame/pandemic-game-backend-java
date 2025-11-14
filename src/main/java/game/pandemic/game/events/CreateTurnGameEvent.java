@@ -3,7 +3,7 @@ package game.pandemic.game.events;
 import game.pandemic.game.Game;
 import game.pandemic.game.turn.Turn;
 import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
 public class CreateTurnGameEvent extends GameEvent {
-    @OneToOne
+    @ManyToOne
     private Turn turn;
 
     @Override
