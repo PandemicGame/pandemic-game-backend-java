@@ -8,6 +8,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -17,8 +19,10 @@ public class ExecuteActionEffectGameEvent extends GameEvent {
 
     @Override
     public void apply(final Game game) {
-        final GameEvent event = this.actionEffect.createEvent();
-        game.processEvent(event);
+        final List<GameEvent> events = this.actionEffect.createEvents();
+        for (final GameEvent event : events) {
+            game.processEvent(event);
+        }
         game.getCurrentTurn().getCurrentPhase().next();
     }
 }
