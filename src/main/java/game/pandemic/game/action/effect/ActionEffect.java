@@ -9,6 +9,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class ActionEffect implements IWebSocketData {
@@ -23,5 +25,5 @@ public abstract class ActionEffect implements IWebSocketData {
         this.executingPlayer = executingPlayer;
     }
 
-    public abstract GameEvent createEvent();
+    public abstract List<GameEvent> createEvents();
 }

@@ -12,6 +12,8 @@ import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MoveActionEffect extends ActionEffect {
@@ -31,7 +33,7 @@ public class MoveActionEffect extends ActionEffect {
     }
 
     @Override
-    public GameEvent createEvent() {
-        return new MoveGameEvent(this.movedPlayer, this.movedPlayer.getCurrentField(), this.toField);
+    public List<GameEvent> createEvents() {
+        return List.of(new MoveGameEvent(this.movedPlayer, this.movedPlayer.getCurrentField(), this.toField));
     }
 }
