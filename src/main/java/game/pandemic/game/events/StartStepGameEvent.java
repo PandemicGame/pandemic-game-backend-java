@@ -14,9 +14,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class StartStepGameEvent<P extends Phase<P>> extends GameEvent {
-    @ManyToOne
+    @ManyToOne(targetEntity = Phase.class)
     private P phase;
-    @OneToOne
+    @OneToOne(targetEntity = Step.class)
     private Step<P> step;
 
     @Override
