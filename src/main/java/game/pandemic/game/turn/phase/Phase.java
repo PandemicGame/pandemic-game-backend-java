@@ -19,7 +19,7 @@ public abstract class Phase<P extends Phase<P>> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne
+    @ManyToOne
     protected Turn turn;
     @OneToMany(cascade = CascadeType.ALL)
     protected List<Step<P>> steps;
