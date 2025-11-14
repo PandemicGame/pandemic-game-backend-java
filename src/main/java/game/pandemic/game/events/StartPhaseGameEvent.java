@@ -16,7 +16,7 @@ public class StartPhaseGameEvent extends GameEvent {
     @ManyToOne
     private Turn turn;
     @ManyToOne
-    private Phase phase;
+    private Phase<?> phase;
 
     @Override
     public void apply(final Game game) {
