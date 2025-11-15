@@ -3,12 +3,16 @@ package game.pandemic.game.player;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import game.pandemic.game.board.Field;
+import game.pandemic.game.card.player.PlayerCard;
 import game.pandemic.game.role.Role;
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.lobby.member.LobbyMember;
 import game.pandemic.websocket.IWebSocketData;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.LinkedList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,11 +34,15 @@ public class Player implements IWebSocketData {
     @ManyToOne
     @JsonView(JacksonView.Read.class)
     private Role role;
+    @OneToMany(cascade = CascadeType.PERSIST)
+    @JsonView(JacksonView.Read.class)
+    private List<PlayerCard> handCards;
 
     public Player(final LobbyMember lobbyMember, final Field startingField, final Role role) {
         this.lobbyMember = lobbyMember;
         this.currentField = startingField;
         this.role = role;
+        this.handCards = new LinkedList<>();
     }
 
     @JsonView(JacksonView.Read.class)
@@ -44,5 +52,9 @@ public class Player implements IWebSocketData {
 
     public boolean containsLobbyMember(final LobbyMember lobbyMember) {
         return this.lobbyMember.equals(lobbyMember);
+    }
+
+    public void addHandCard(final PlayerCard card) {
+        this.handCards.add(card);
     }
 }
