@@ -37,6 +37,11 @@ public class Player implements IWebSocketData {
         this.role = role;
     }
 
+    @JsonView(JacksonView.Read.class)
+    public String getName() {
+        return this.lobbyMember.getName();
+    }
+
     public boolean containsLobbyMember(final LobbyMember lobbyMember) {
         return this.lobbyMember.equals(lobbyMember);
     }
