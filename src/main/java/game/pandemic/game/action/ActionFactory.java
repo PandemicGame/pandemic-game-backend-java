@@ -19,7 +19,7 @@ public class ActionFactory {
 
     public List<Action> createAllActions(final Player player) {
         return this.reflections.getSubTypesOf(Action.class).stream()
-                .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()) && !Modifier.isInterface(clazz.getModifiers()))
+                .filter(clazz -> isValidActionClass(clazz, player))
                 .map(clazz -> {
                     try {
                         final Constructor<? extends Action> constructor = clazz.getConstructor(Player.class);
@@ -30,5 +30,12 @@ public class ActionFactory {
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+    }
+
+    private boolean isValidActionClass(final Class<? extends Action> actionClass, final Player player) {
+        return !Modifier.isAbstract(actionClass.getModifiers()) && !Modifier.isInterface(actionClass.getModifiers()) && (
+                (IGeneralAction.class.isAssignableFrom(actionClass) && !player.getRole().getAbility().getRemovedGeneralActions().contains(actionClass.getName())) ||
+                (IRoleAction.class.isAssignableFrom(actionClass) && player.getRole().getAbility().getAdditionalRoleActions().contains(actionClass.getName()))
+        );
     }
 }
