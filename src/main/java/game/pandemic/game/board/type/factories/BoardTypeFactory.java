@@ -7,6 +7,8 @@ import game.pandemic.game.board.type.BoardSettings;
 import game.pandemic.game.board.type.BoardSlot;
 import game.pandemic.game.board.type.BoardType;
 import game.pandemic.game.board.type.BoardTypeCreationException;
+import game.pandemic.game.board.type.option.BoardTypeOptionNumberOfEpidemicCards;
+import game.pandemic.game.board.type.option.BoardTypeOptionStartingNumberOfHandCards;
 import game.pandemic.game.plague.Plague;
 import game.pandemic.game.plague.PlagueCode;
 import game.pandemic.game.plague.PlagueRepository;
@@ -26,7 +28,14 @@ public abstract class BoardTypeFactory {
 
     public BoardType createBoardType() throws BoardTypeCreationException {
         try {
-            return new BoardType(getName(), findStartingLocationOrThrow(), createBoardSlots(), createBoardSettings());
+            return new BoardType(
+                    getName(),
+                    findStartingLocationOrThrow(),
+                    createBoardSlots(),
+                    createBoardSettings(),
+                    createBoardTypeOptionStartingNumberOfHandCards(),
+                    createBoardTypeOptionNumberOfEpidemicCards()
+            );
         } catch (final NoSuchElementException e) {
             throw new BoardTypeCreationException(e);
         }
@@ -39,6 +48,10 @@ public abstract class BoardTypeFactory {
     protected abstract List<BoardSlot> createBoardSlots() throws NoSuchElementException;
 
     protected abstract BoardSettings createBoardSettings();
+
+    protected abstract BoardTypeOptionStartingNumberOfHandCards createBoardTypeOptionStartingNumberOfHandCards();
+
+    protected abstract BoardTypeOptionNumberOfEpidemicCards createBoardTypeOptionNumberOfEpidemicCards();
 
     protected Location findLocationOrThrow(final LocationCode locationCode) throws NoSuchElementException {
         return findLocation(locationCode).orElseThrow();
