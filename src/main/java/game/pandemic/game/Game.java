@@ -66,7 +66,7 @@ public class Game implements IWebSocketData, IEventContext<Game, GameEvent> {
         this.board = new Board(boardType);
         this.numberOfActionsPerTurn = numberOfActionsPerTurn;
         this.playersInTurnOrder = createPlayersInTurnOrderList(lobbyMemberRoleAssociations);
-        this.currentPlayerIndex = 0;
+        this.currentPlayerIndex = -1;
         this.turns = new LinkedList<>();
         processEvent(new CreateTurnGameEvent());
     }
@@ -88,6 +88,10 @@ public class Game implements IWebSocketData, IEventContext<Game, GameEvent> {
 
     public boolean isCurrentPlayer(final Player player) {
         return getCurrentPlayer().equals(player);
+    }
+
+    public void nextPlayer() {
+        this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.playersInTurnOrder.size();
     }
 
     public Optional<Player> findPlayerByLobbyMember(final LobbyMember lobbyMember) {
