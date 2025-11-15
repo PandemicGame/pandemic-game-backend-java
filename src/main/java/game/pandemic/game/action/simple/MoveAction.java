@@ -1,5 +1,6 @@
 package game.pandemic.game.action.simple;
 
+import game.pandemic.game.Game;
 import game.pandemic.game.action.Action;
 import game.pandemic.game.action.effect.ActionEffect;
 import game.pandemic.game.action.effect.MoveActionEffect;
@@ -14,8 +15,8 @@ import java.util.List;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class MoveAction extends Action {
-    protected MoveAction(final Player executingPlayer) {
-        super(executingPlayer);
+    protected MoveAction(final Game game, final Player executingPlayer) {
+        super(game, executingPlayer);
     }
 
     @Override

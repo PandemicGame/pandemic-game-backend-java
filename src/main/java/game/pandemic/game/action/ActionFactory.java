@@ -1,5 +1,6 @@
 package game.pandemic.game.action;
 
+import game.pandemic.game.Game;
 import game.pandemic.game.player.Player;
 import org.reflections.Reflections;
 
@@ -17,13 +18,13 @@ public class ActionFactory {
         this.reflections = new Reflections(Action.class.getPackageName());
     }
 
-    public List<Action> createAllActions(final Player player) {
+    public List<Action> createAllActions(final Game game, final Player executingPlayer) {
         return this.reflections.getSubTypesOf(Action.class).stream()
-                .filter(clazz -> isValidActionClass(clazz, player))
+                .filter(clazz -> isValidActionClass(clazz, executingPlayer))
                 .map(clazz -> {
                     try {
-                        final Constructor<? extends Action> constructor = clazz.getConstructor(Player.class);
-                        return constructor.newInstance(player);
+                        final Constructor<? extends Action> constructor = clazz.getConstructor(Game.class, Player.class);
+                        return constructor.newInstance(game, executingPlayer);
                     } catch (final NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException ignored) {
                     }
                     return null;
