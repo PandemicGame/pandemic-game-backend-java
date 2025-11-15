@@ -2,7 +2,9 @@ package game.pandemic.game.board;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import game.pandemic.game.board.type.BoardSlot;
+import game.pandemic.game.plague.Plague;
 import game.pandemic.jackson.JacksonView;
+import game.pandemic.util.Color;
 import game.pandemic.websocket.IWebSocketData;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -48,9 +50,17 @@ public class Field implements IWebSocketData {
         return this.slot.getYCoordinate();
     }
 
+    public Plague getPlague() {
+        return this.slot.getPlague();
+    }
+
+    public Color getColor() {
+        return getPlague().getColor();
+    }
+
     @JsonView(JacksonView.Read.class)
     public String getPlagueCode() {
-        return this.slot.getPlague().getCode();
+        return getPlague().getCode();
     }
 
     @JsonView(JacksonView.Read.class)
