@@ -2,6 +2,8 @@ package game.pandemic.game.board.type;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import game.pandemic.game.board.location.Location;
+import game.pandemic.game.board.type.option.BoardTypeOptionNumberOfEpidemicCards;
+import game.pandemic.game.board.type.option.BoardTypeOptionStartingNumberOfHandCards;
 import game.pandemic.game.plague.Plague;
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.websocket.IWebSocketData;
@@ -31,12 +33,23 @@ public class BoardType implements IWebSocketData {
     private List<BoardSlot> slots;
     @Embedded
     private BoardSettings settings;
+    @OneToOne(cascade = CascadeType.ALL)
+    private BoardTypeOptionStartingNumberOfHandCards startingNumberOfHandCards;
+    @OneToOne(cascade = CascadeType.ALL)
+    private BoardTypeOptionNumberOfEpidemicCards numberOfEpidemicCards;
 
-    public BoardType(final String name, final Location startingLocation, final List<BoardSlot> slots, final BoardSettings settings) {
+    public BoardType(final String name,
+                     final Location startingLocation,
+                     final List<BoardSlot> slots,
+                     final BoardSettings settings,
+                     final BoardTypeOptionStartingNumberOfHandCards startingNumberOfHandCards,
+                     final BoardTypeOptionNumberOfEpidemicCards numberOfEpidemicCards) {
         this.name = name;
         this.startingLocation = startingLocation;
         this.slots = slots;
         this.settings = settings;
+        this.startingNumberOfHandCards = startingNumberOfHandCards;
+        this.numberOfEpidemicCards = numberOfEpidemicCards;
     }
 
     public Optional<BoardSlot> findBoardSlotForLocation(final Location location) {

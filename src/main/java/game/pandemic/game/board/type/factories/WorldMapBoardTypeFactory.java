@@ -4,6 +4,8 @@ import game.pandemic.game.board.location.Location;
 import game.pandemic.game.board.location.LocationRepository;
 import game.pandemic.game.board.type.BoardSettings;
 import game.pandemic.game.board.type.BoardSlot;
+import game.pandemic.game.board.type.option.BoardTypeOptionNumberOfEpidemicCards;
+import game.pandemic.game.board.type.option.BoardTypeOptionStartingNumberOfHandCards;
 import game.pandemic.game.plague.Plague;
 import game.pandemic.game.plague.PlagueCode;
 import game.pandemic.game.plague.PlagueRepository;
@@ -130,6 +132,24 @@ public class WorldMapBoardTypeFactory extends BoardTypeFactory {
                 180,
                 -85,
                 85
+        );
+    }
+
+    @Override
+    protected BoardTypeOptionStartingNumberOfHandCards createBoardTypeOptionStartingNumberOfHandCards() {
+        return new BoardTypeOptionStartingNumberOfHandCards(new BoardTypeOptionStartingNumberOfHandCards.StartingNumberOfHandCardsByNumberOfPlayersList(
+                4,
+                3,
+                2
+        ));
+    }
+
+    @Override
+    protected BoardTypeOptionNumberOfEpidemicCards createBoardTypeOptionNumberOfEpidemicCards() {
+        return new BoardTypeOptionNumberOfEpidemicCards(
+                4,
+                5,
+                6
         );
     }
 }
