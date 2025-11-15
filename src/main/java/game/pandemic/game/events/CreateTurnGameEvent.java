@@ -17,6 +17,7 @@ public class CreateTurnGameEvent extends GameEvent {
 
     @Override
     public void apply(final Game game) {
+        game.nextPlayer();
         this.turn = new Turn(game);
         game.addTurn(this.turn);
     }
