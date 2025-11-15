@@ -24,5 +24,9 @@ public abstract class MoveAction extends Action {
         return new ArrayList<>(createAvailableMoveEffects());
     }
 
+    protected List<Player> getMovablePlayers() {
+        return List.of(this.executingPlayer);
+    }
+
     protected abstract List<MoveActionEffect> createAvailableMoveEffects();
 }
