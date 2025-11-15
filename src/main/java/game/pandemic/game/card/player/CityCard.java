@@ -2,6 +2,7 @@ package game.pandemic.game.card.player;
 
 import game.pandemic.game.board.Field;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = true)
 public class CityCard extends PlayerCard {
+    @ManyToOne
     private Field associatedField;
 
     public CityCard(final Field associatedField) {
