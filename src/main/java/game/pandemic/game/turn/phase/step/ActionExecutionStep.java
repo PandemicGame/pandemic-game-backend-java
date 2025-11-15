@@ -16,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class ActionExecutionStep extends Step<ActionPhase> {
-    public static final ActionFactory ACTION_FACTORY = new ActionFactory();
+    private static final ActionFactory ACTION_FACTORY = new ActionFactory();
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Action> availableActions;
