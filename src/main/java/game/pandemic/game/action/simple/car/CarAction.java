@@ -19,8 +19,10 @@ public abstract class CarAction extends MoveAction {
 
     @Override
     protected List<MoveActionEffect> createAvailableMoveEffects() {
-        return this.executingPlayer.getCurrentField().getConnections().stream()
-                .map(field -> new MoveActionEffect(this.executingPlayer, this.executingPlayer, field))
+        return getMovablePlayers().stream()
+                .flatMap(player -> player.getCurrentField().getConnections().stream()
+                        .map(field -> new MoveActionEffect(this.executingPlayer, player, field))
+                        .toList().stream())
                 .toList();
     }
 }
