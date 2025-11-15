@@ -38,8 +38,8 @@ public class ActionPhase extends Phase<ActionPhase> {
     }
 
     @Override
-    protected ActionPhase createNextPhase() {
-        return new ActionPhase(this.turn, this.numberOfActionExecutionSteps);
+    protected EndPhase createNextPhase() {
+        return new EndPhase(this.turn);
     }
 
     public List<Action> getAvailableActions() {
