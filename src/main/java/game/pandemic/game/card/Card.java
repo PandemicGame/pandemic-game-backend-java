@@ -18,10 +18,11 @@ public abstract class Card implements IWebSocketData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
-    @JsonView(JacksonView.Read.class)
     private Long id;
+    @JsonView(JacksonView.Read.class)
     private String title;
     @Embedded
+    @JsonView(JacksonView.Read.class)
     private Color color;
 
     protected Card(final String title, final Color color) {
