@@ -14,7 +14,7 @@ import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class MoveAction extends Action {
+public abstract class MoveAction extends Action implements IMoveAction {
     protected MoveAction(final Game game, final Player executingPlayer) {
         super(game, executingPlayer);
     }
@@ -22,10 +22,6 @@ public abstract class MoveAction extends Action {
     @Override
     protected final List<ActionEffect> createAvailableEffects() {
         return new ArrayList<>(createAvailableMoveEffects());
-    }
-
-    protected List<Player> getMovablePlayers() {
-        return List.of(this.executingPlayer);
     }
 
     protected abstract List<MoveActionEffect> createAvailableMoveEffects();
