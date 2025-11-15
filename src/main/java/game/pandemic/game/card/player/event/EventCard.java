@@ -1,6 +1,8 @@
 package game.pandemic.game.card.player.event;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import game.pandemic.game.card.player.PlayerCard;
+import game.pandemic.jackson.JacksonView;
 import game.pandemic.util.Color;
 import jakarta.persistence.Entity;
 import lombok.AccessLevel;
@@ -15,6 +17,7 @@ import lombok.NoArgsConstructor;
 public abstract class EventCard extends PlayerCard {
     public static final Color COLOR = new Color(255, 165, 0);
 
+    @JsonView(JacksonView.Read.class)
     private String description;
 
     protected EventCard(final String title, final String description) {
