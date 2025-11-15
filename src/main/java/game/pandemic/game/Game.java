@@ -5,6 +5,12 @@ import game.pandemic.event.IEventContext;
 import game.pandemic.game.board.Board;
 import game.pandemic.game.board.Field;
 import game.pandemic.game.board.type.BoardType;
+import game.pandemic.game.card.CardStack;
+import game.pandemic.game.card.InfectionCard;
+import game.pandemic.game.card.player.CityCard;
+import game.pandemic.game.card.player.EpidemicCard;
+import game.pandemic.game.card.player.PlayerCard;
+import game.pandemic.game.card.player.event.EventCardFactory;
 import game.pandemic.game.events.CreateGameEvent;
 import game.pandemic.game.events.CreateTurnGameEvent;
 import game.pandemic.game.events.GameEvent;
@@ -21,16 +27,15 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Game implements IWebSocketData, IEventContext<Game, GameEvent> {
     public static final int DEFAULT_NUMBER_OF_ACTIONS_PER_TURN = 4;
+
+    private static final EventCardFactory EVENT_CARD_FACTORY = new EventCardFactory();
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,6 +59,14 @@ public class Game implements IWebSocketData, IEventContext<Game, GameEvent> {
     private List<Turn> turns;
     private int startingNumberOfHandCards;
     private int numberOfEpidemicCards;
+    @OneToOne(cascade = CascadeType.ALL)
+    private CardStack<PlayerCard> playerCardDrawStack;
+    @OneToOne(cascade = CascadeType.ALL)
+    private CardStack<PlayerCard> playerCardDiscardStack;
+    @OneToOne(cascade = CascadeType.ALL)
+    private CardStack<InfectionCard> infectionCardDrawStack;
+    @OneToOne(cascade = CascadeType.ALL)
+    private CardStack<InfectionCard> infectionCardDiscardStack;
     @OneToMany(cascade = CascadeType.ALL)
     private List<GameEvent> eventChain;
 
@@ -78,6 +91,59 @@ public class Game implements IWebSocketData, IEventContext<Game, GameEvent> {
         this.startingNumberOfHandCards = startingNumberOfHandCards;
         this.numberOfEpidemicCards = numberOfEpidemicCards;
         processEvent(new CreateTurnGameEvent());
+        initializeCardStacks();
+    }
+
+    private void initializeCardStacks() {
+        this.playerCardDrawStack = new CardStack<>();
+        this.playerCardDiscardStack = new CardStack<>();
+        this.infectionCardDrawStack = new CardStack<>();
+        this.infectionCardDiscardStack = new CardStack<>();
+
+        fillPlayerCardDrawStack();
+        distributePlayerCardsToPlayers();
+        addEpidemicCardsToPlayerCardDrawStack();
+        fillInfectionCardDrawStack();
+    }
+
+    private void fillPlayerCardDrawStack() {
+        for (final Field field : this.board.getFields()) {
+            this.playerCardDrawStack.push(new CityCard(field));
+        }
+
+        EVENT_CARD_FACTORY.createEventCards().forEach(card -> this.playerCardDrawStack.push(card));
+
+        this.playerCardDrawStack.shuffle();
+    }
+
+    private void distributePlayerCardsToPlayers() {
+        for (final Player player : this.playersInTurnOrder) {
+            for (int i = 0; i < this.startingNumberOfHandCards; i++) {
+                player.addHandCard(this.playerCardDrawStack.pop());
+            }
+        }
+    }
+
+    private void addEpidemicCardsToPlayerCardDrawStack() {
+        if (this.numberOfEpidemicCards <= 0) {
+            return;
+        }
+
+        final List<CardStack<PlayerCard>> playerCardSubstacks = this.playerCardDrawStack.divideIntoSubstacks(this.numberOfEpidemicCards);
+        for (final CardStack<PlayerCard> playerCardSubstack : playerCardSubstacks) {
+            playerCardSubstack.push(new EpidemicCard());
+            playerCardSubstack.shuffle();
+        }
+        playerCardSubstacks.sort(Comparator.comparingInt(CardStack::size));
+        this.playerCardDrawStack = new CardStack<>(playerCardSubstacks);
+    }
+
+    private void fillInfectionCardDrawStack() {
+        for (final Field field : this.board.getFields()) {
+            this.infectionCardDrawStack.push(new InfectionCard(field));
+        }
+
+        this.infectionCardDrawStack.shuffle();
     }
 
     private List<Player> createPlayersInTurnOrderList(final List<LobbyMemberRoleAssociation> lobbyMemberRoleAssociations) {
