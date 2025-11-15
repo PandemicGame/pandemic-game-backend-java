@@ -23,6 +23,6 @@ public class ActionExecutionStep extends Step<ActionPhase> {
 
     public ActionExecutionStep(final ActionPhase phase) {
         super(phase);
-        this.availableActions = ACTION_FACTORY.createAllActions(phase.getPlayer());
+        this.availableActions = ACTION_FACTORY.createAllActions(phase.getTurn().getGame(), phase.getPlayer());
     }
 }
