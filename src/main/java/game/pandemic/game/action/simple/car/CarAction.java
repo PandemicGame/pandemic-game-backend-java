@@ -11,8 +11,8 @@ import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CarAction extends MoveAction {
-    public CarAction(final Player executingPlayer) {
+public abstract class CarAction extends MoveAction {
+    protected CarAction(final Player executingPlayer) {
         super(executingPlayer);
     }
 
