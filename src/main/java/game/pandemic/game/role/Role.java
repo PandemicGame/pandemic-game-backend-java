@@ -22,9 +22,12 @@ public class Role implements IWebSocketData {
     @Embedded
     @JsonView(JacksonView.Read.class)
     private Color color;
+    @Embedded
+    private RoleAbility ability;
 
-    public Role(final String name, final Color color) {
+    public Role(final String name, final Color color, final RoleAbility ability) {
         this.name = name;
         this.color = color;
+        this.ability = ability;
     }
 }
