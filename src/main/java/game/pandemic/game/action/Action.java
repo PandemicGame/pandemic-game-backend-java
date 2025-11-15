@@ -15,7 +15,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public abstract class Action implements IWebSocketData {
+public abstract class Action implements IAction, IWebSocketData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
