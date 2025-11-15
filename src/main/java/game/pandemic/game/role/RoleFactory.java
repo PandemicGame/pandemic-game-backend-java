@@ -1,5 +1,6 @@
 package game.pandemic.game.role;
 
+import game.pandemic.game.action.simple.car.CarActionForAlly;
 import game.pandemic.util.Color;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +23,9 @@ public class RoleFactory {
                 "Dispatcher",
                 new Color(204, 0, 153),
                 new RoleAbility(
-                        List.of(),
+                        List.of(
+                                CarActionForAlly.class
+                        ),
                         List.of()
                 )
         );
