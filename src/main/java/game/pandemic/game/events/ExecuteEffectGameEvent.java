@@ -19,6 +19,10 @@ public class ExecuteEffectGameEvent extends GameEvent {
 
     @Override
     public void apply(final Game game) {
+        if (!this.effect.isAvailable(game)) {
+            return;
+        }
+
         final List<GameEvent> events = this.effect.createEvents();
         for (final GameEvent event : events) {
             game.processEvent(event);
