@@ -2,6 +2,7 @@ package game.pandemic.game.action.effect;
 
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonView;
+import game.pandemic.game.Game;
 import game.pandemic.game.board.Field;
 import game.pandemic.game.events.GameEvent;
 import game.pandemic.game.events.MoveGameEvent;
@@ -48,5 +49,10 @@ public class MoveActionEffect extends ActionEffect {
     @Override
     public boolean requiresApproval() {
         return !this.executingPlayer.equals(this.targetPlayer);
+    }
+
+    @Override
+    public boolean isAvailable(final Game game) {
+        return super.isAvailable(game) && getMovedPlayer().getCurrentField().equals(this.fromField);
     }
 }
