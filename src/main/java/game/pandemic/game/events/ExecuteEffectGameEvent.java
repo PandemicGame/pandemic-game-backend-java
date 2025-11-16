@@ -1,7 +1,7 @@
 package game.pandemic.game.events;
 
 import game.pandemic.game.Game;
-import game.pandemic.game.action.effect.ActionEffect;
+import game.pandemic.game.effect.Effect;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
@@ -13,13 +13,13 @@ import java.util.List;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class ExecuteActionEffectGameEvent extends GameEvent {
+public class ExecuteEffectGameEvent extends GameEvent {
     @OneToOne
-    private ActionEffect actionEffect;
+    private Effect effect;
 
     @Override
     public void apply(final Game game) {
-        final List<GameEvent> events = this.actionEffect.createEvents();
+        final List<GameEvent> events = this.effect.createEvents();
         for (final GameEvent event : events) {
             game.processEvent(event);
         }

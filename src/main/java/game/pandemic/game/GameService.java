@@ -7,7 +7,7 @@ import game.pandemic.game.board.type.BoardTypeRepository;
 import game.pandemic.game.board.type.BoardTypeService;
 import game.pandemic.game.board.type.factories.WorldMapBoardTypeFactory;
 import game.pandemic.game.events.CreateGameEvent;
-import game.pandemic.game.events.ExecuteActionEffectGameEvent;
+import game.pandemic.game.events.ExecuteEffectGameEvent;
 import game.pandemic.game.plague.PlagueService;
 import game.pandemic.game.player.Player;
 import game.pandemic.game.role.LobbyMemberRoleAssociation;
@@ -150,7 +150,7 @@ public class GameService {
 
     private void createAndProcessExecuteActionEffectGameEvent(final Game game, final Long actionEffectId) {
         this.actionEffectRepository.findById(actionEffectId).ifPresent(actionEffect -> {
-            game.processEvent(new ExecuteActionEffectGameEvent(actionEffect));
+            game.processEvent(new ExecuteEffectGameEvent(actionEffect));
             final Game saved = this.gameRepository.save(game);
             sendGameToPlayers(saved);
         });
