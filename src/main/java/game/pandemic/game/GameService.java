@@ -138,11 +138,13 @@ public class GameService {
 
     @Transactional
     public void executeEffect(final Player player, final Long effectId) {
-        executeInGameOfPlayer(player, game -> {
-            if (game.isCurrentPlayer(player)) {
-                findEffectToCreateAndProcessExecuteEffectGameEvent(game, effectId, null);
-            }
-        });
+        executeEffect(player, effectId, null);
+    }
+
+    private void executeEffect(final Player player, final Long effectId, final Consumer<Effect> modifier) {
+        executeInGameOfPlayer(player, game ->
+                findEffectToCreateAndProcessExecuteEffectGameEvent(game, effectId, modifier)
+        );
     }
 
     private void executeInGameOfPlayer(final Player player, final Consumer<Game> callback) {
@@ -191,14 +193,14 @@ public class GameService {
     }
 
     private void answerEffect(final Player player, final Long effectId, final Consumer<Effect> responder) {
-        executeInGameOfPlayer(player, game -> findEffectToCreateAndProcessExecuteEffectGameEvent(
-                game,
+        executeEffect(
+                player,
                 effectId,
                 effect -> {
                     if (effect.getTargetPlayer().equals(player)) {
                         responder.accept(effect);
                     }
-                })
+                }
         );
     }
 }
