@@ -1,11 +1,11 @@
 package game.pandemic.game;
 
-import game.pandemic.game.action.effect.ActionEffectRepository;
 import game.pandemic.game.board.location.LocationService;
 import game.pandemic.game.board.type.BoardType;
 import game.pandemic.game.board.type.BoardTypeRepository;
 import game.pandemic.game.board.type.BoardTypeService;
 import game.pandemic.game.board.type.factories.WorldMapBoardTypeFactory;
+import game.pandemic.game.effect.EffectRepository;
 import game.pandemic.game.events.CreateGameEvent;
 import game.pandemic.game.events.ExecuteEffectGameEvent;
 import game.pandemic.game.plague.PlagueService;
@@ -33,7 +33,7 @@ import java.util.function.UnaryOperator;
 @Service
 @RequiredArgsConstructor
 public class GameService {
-    private final ActionEffectRepository actionEffectRepository;
+    private final EffectRepository effectRepository;
     private final BoardTypeRepository boardTypeRepository;
     private final BoardTypeService boardTypeService;
     private final GameRepository gameRepository;
@@ -149,7 +149,7 @@ public class GameService {
     }
 
     private void createAndProcessExecuteActionEffectGameEvent(final Game game, final Long actionEffectId) {
-        this.actionEffectRepository.findById(actionEffectId).ifPresent(actionEffect -> {
+        this.effectRepository.findById(actionEffectId).ifPresent(actionEffect -> {
             game.processEvent(new ExecuteEffectGameEvent(actionEffect));
             final Game saved = this.gameRepository.save(game);
             sendGameToPlayers(saved);
