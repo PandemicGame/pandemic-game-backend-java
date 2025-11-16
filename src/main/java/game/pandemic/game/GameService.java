@@ -5,6 +5,7 @@ import game.pandemic.game.board.type.BoardType;
 import game.pandemic.game.board.type.BoardTypeRepository;
 import game.pandemic.game.board.type.BoardTypeService;
 import game.pandemic.game.board.type.factories.WorldMapBoardTypeFactory;
+import game.pandemic.game.effect.Effect;
 import game.pandemic.game.effect.EffectRepository;
 import game.pandemic.game.events.CreateGameEvent;
 import game.pandemic.game.events.ExecuteEffectGameEvent;
@@ -139,7 +140,7 @@ public class GameService {
     public void executeEffect(final Player player, final Long effectId) {
         executeInGameOfPlayer(player, game -> {
             if (game.isCurrentPlayer(player)) {
-                createAndProcessExecuteEffectGameEvent(game, effectId);
+                findEffectToCreateAndProcessExecuteEffectGameEvent(game, effectId, null);
             }
         });
     }
@@ -148,12 +149,29 @@ public class GameService {
         this.gameRepository.findByPlayersInTurnOrderContaining(player).ifPresent(callback);
     }
 
-    private void createAndProcessExecuteEffectGameEvent(final Game game, final Long effectId) {
-        this.effectRepository.findById(effectId).ifPresent(effect -> {
-            game.processEvent(new ExecuteEffectGameEvent(effect));
-            final Game saved = this.gameRepository.save(game);
-            sendGameToPlayers(saved);
-        });
+    private void findEffectToCreateAndProcessExecuteEffectGameEvent(final Game game, final Long effectId, final Consumer<Effect> modifier) {
+        this.effectRepository.findById(effectId).ifPresent(effect -> createAndProcessExecuteEffectGameEvent(game, effect, modifier));
+    }
+
+    private void createAndProcessExecuteEffectGameEvent(final Game game, final Effect effect, final Consumer<Effect> modifier) {
+        if (modifier != null) {
+            modifier.accept(effect);
+        }
+
+        if (effect.requiresApproval()) {
+            if (effect.isRejected()) {
+                final Game saved = this.gameRepository.save(game);
+                sendGameToPlayers(saved);
+                return;
+            } else if (!effect.isApproved()) {
+                this.playerMessenger.unicast(effect.getTargetPlayer(), effect, JacksonView.Read.class);
+                return;
+            }
+        }
+
+        game.processEvent(new ExecuteEffectGameEvent(effect));
+        final Game saved = this.gameRepository.save(game);
+        sendGameToPlayers(saved);
     }
 
     private void sendGameToPlayers(final Game game) {
