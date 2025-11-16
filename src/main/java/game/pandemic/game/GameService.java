@@ -136,10 +136,10 @@ public class GameService {
     }
 
     @Transactional
-    public void executeActionEffect(final Player player, final Long actionEffectId) {
+    public void executeEffect(final Player player, final Long effectId) {
         executeInGameOfPlayer(player, game -> {
             if (game.isCurrentPlayer(player)) {
-                createAndProcessExecuteActionEffectGameEvent(game, actionEffectId);
+                createAndProcessExecuteEffectGameEvent(game, effectId);
             }
         });
     }
@@ -148,9 +148,9 @@ public class GameService {
         this.gameRepository.findByPlayersInTurnOrderContaining(player).ifPresent(callback);
     }
 
-    private void createAndProcessExecuteActionEffectGameEvent(final Game game, final Long actionEffectId) {
-        this.effectRepository.findById(actionEffectId).ifPresent(actionEffect -> {
-            game.processEvent(new ExecuteEffectGameEvent(actionEffect));
+    private void createAndProcessExecuteEffectGameEvent(final Game game, final Long effectId) {
+        this.effectRepository.findById(effectId).ifPresent(effect -> {
+            game.processEvent(new ExecuteEffectGameEvent(effect));
             final Game saved = this.gameRepository.save(game);
             sendGameToPlayers(saved);
         });

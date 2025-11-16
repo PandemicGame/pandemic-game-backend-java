@@ -22,7 +22,7 @@ public class ExecuteActionEffect extends GameWebSocketControllerEndpoint {
     @Override
     public void consume(final Player player, final String message) {
         if (NumberUtils.isCreatable(message)) {
-            this.gameService.executeActionEffect(player, Long.parseLong(message));
+            this.gameService.executeEffect(player, Long.parseLong(message));
         }
     }
 }
