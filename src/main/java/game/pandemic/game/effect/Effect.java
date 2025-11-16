@@ -6,19 +6,18 @@ import game.pandemic.game.player.Player;
 import game.pandemic.jackson.JacksonView;
 import game.pandemic.websocket.IWebSocketData;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public abstract class Effect implements IWebSocketData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     @JsonView(JacksonView.Read.class)
     private Long id;
     @ManyToOne
