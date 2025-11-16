@@ -185,6 +185,11 @@ public class GameService {
         answerEffect(player, effectId, effect -> effect.setApproved(true));
     }
 
+    @Transactional
+    public void rejectEffect(final Player player, final Long effectId) {
+        answerEffect(player, effectId, effect -> effect.setRejected(true));
+    }
+
     private void answerEffect(final Player player, final Long effectId, final Consumer<Effect> responder) {
         executeInGameOfPlayer(player, game -> findEffectToCreateAndProcessExecuteEffectGameEvent(
                 game,
