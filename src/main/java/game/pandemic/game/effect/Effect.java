@@ -1,6 +1,7 @@
 package game.pandemic.game.effect;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import game.pandemic.game.Game;
 import game.pandemic.game.events.GameEvent;
 import game.pandemic.game.player.Player;
 import game.pandemic.jackson.JacksonView;
@@ -39,4 +40,8 @@ public abstract class Effect implements IWebSocketData {
     public abstract List<GameEvent> createEvents();
 
     public abstract boolean requiresApproval();
+
+    public boolean isAvailable(final Game game) {
+        return !requiresApproval() || this.isApproved;
+    }
 }
