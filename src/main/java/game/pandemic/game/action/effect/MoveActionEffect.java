@@ -20,20 +20,26 @@ public class MoveActionEffect extends ActionEffect {
     @ManyToOne
     @JsonView(JacksonView.Read.class)
     @JsonIdentityReference(alwaysAsId = true)
-    private Player movedPlayer;
-    @ManyToOne
-    @JsonView(JacksonView.Read.class)
-    @JsonIdentityReference(alwaysAsId = true)
     private Field toField;
 
     public MoveActionEffect(final Player executingPlayer, final Player movedPlayer, final Field toField) {
-        super(executingPlayer);
-        this.movedPlayer = movedPlayer;
+        super(executingPlayer, movedPlayer);
         this.toField = toField;
+    }
+
+    @JsonView(JacksonView.Read.class)
+    @JsonIdentityReference(alwaysAsId = true)
+    public Player getMovedPlayer() {
+        return this.targetPlayer;
     }
 
     @Override
     public List<GameEvent> createEvents() {
-        return List.of(new MoveGameEvent(this.movedPlayer, this.movedPlayer.getCurrentField(), this.toField));
+        return List.of(new MoveGameEvent(getMovedPlayer(), getMovedPlayer().getCurrentField(), this.toField));
+    }
+
+    @Override
+    public boolean requiresApproval() {
+        return !this.executingPlayer.equals(this.targetPlayer);
     }
 }
