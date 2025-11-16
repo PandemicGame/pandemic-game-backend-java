@@ -179,4 +179,21 @@ public class GameService {
             this.playerMessenger.unicast(player, game, JacksonView.Read.class);
         }
     }
+
+    @Transactional
+    public void approveEffect(final Player player, final Long effectId) {
+        answerEffect(player, effectId, effect -> effect.setApproved(true));
+    }
+
+    private void answerEffect(final Player player, final Long effectId, final Consumer<Effect> responder) {
+        executeInGameOfPlayer(player, game -> findEffectToCreateAndProcessExecuteEffectGameEvent(
+                game,
+                effectId,
+                effect -> {
+                    if (effect.getTargetPlayer().equals(player)) {
+                        responder.accept(effect);
+                    }
+                })
+        );
+    }
 }
