@@ -8,6 +8,7 @@ import game.pandemic.util.Color;
 import game.pandemic.websocket.IWebSocketData;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,9 +17,11 @@ import java.util.List;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Field implements IWebSocketData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     @JsonView(JacksonView.Read.class)
     private Long id;
     @ManyToOne
