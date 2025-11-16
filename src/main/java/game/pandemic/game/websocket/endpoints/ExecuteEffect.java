@@ -9,14 +9,14 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ExecuteActionEffect extends GameWebSocketControllerEndpoint {
-    public ExecuteActionEffect(final ObjectMapper objectMapper, final GameService gameService, final PlayerRepository playerRepository) {
+public class ExecuteEffect extends GameWebSocketControllerEndpoint {
+    public ExecuteEffect(final ObjectMapper objectMapper, final GameService gameService, final PlayerRepository playerRepository) {
         super(objectMapper, gameService, playerRepository);
     }
 
     @Override
     public String getEndpointMapping() {
-        return "/execute-action-effect";
+        return "/execute-effect";
     }
 
     @Override
